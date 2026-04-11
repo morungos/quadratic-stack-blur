@@ -3,10 +3,10 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-#define TEST_SIZE 20
+#define TEST_SIZE 30
 
 int data[TEST_SIZE] = {
-    0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 10, 0, 0, 10, 20, 15, 11, 12, 5, 0, 0, 0, 0, 0, 0, 20, 10, 0, 0, 10, 0, 0, 0, 0, 0, 0
 };
 
 /**
@@ -28,6 +28,9 @@ static void blur(int *data, size_t count, size_t r) {
     }
 
     for(int i = 0; i < count; i++) {
+
+        fprintf(stdout, "sum_stack: %d, sum_out: %d, sum_in: %d\n", sum_stack, sum_out, sum_in);
+
         data[i] = sum_stack / stack_size;
         sum_stack -= sum_out;
         sum_out -= buffer[qi];
@@ -125,7 +128,7 @@ static void quadratic(int *data, size_t count, size_t r) {
 }
 
 int main(int argc, char **argv) {
-    blur(data, TEST_SIZE, 3);
+    blur(data, TEST_SIZE, 2);
     fprintf(stdout, "{ ");
     for(int i = 0; i < TEST_SIZE; i++) {
         fprintf(stdout, "%d ", data[i]);
