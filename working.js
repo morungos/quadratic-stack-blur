@@ -27,12 +27,12 @@ for(let i = 0; i < DATA.length; i++) {
     right += p;
     left += rem;
     sum += right;
+    right -= rem;
 
     // Output
     console.log(new Number(sum / (WIDTH * WIDTH)).toFixed(2), sum, left, right, "{ " + BUFFER.join(", ") + "}");
     
     sum -= left;
-    right -= rem;
 }
 
 /**
