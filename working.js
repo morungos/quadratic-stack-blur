@@ -70,10 +70,12 @@ function quadratic_blur(data) {
 
     const width = RADIUS + 1;
     const acc_width = (width) >> 1;
+    const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
     let left = 0, right = 0;
     let left_in = 0, left_out = 0;
     let right_in = 0, right_out = 0;
+    let quad = 0;
 
     // in and out are coded as follows:
     // left_out, left_in, right_out, right_in
@@ -96,27 +98,43 @@ function quadratic_blur(data) {
         // their own small stack blurs, although they won't be symmetric.
         // That is not an issue. Start with the lefts alone.
 
-        left_out -= old;
-
         let left_move = buffer[left_mid];
         let mid_move = buffer[RADIUS];
+        let pre_mid_move = buffer[RADIUS - 1];
+        let right_move = buffer[right_mid];
         
+        left_out -= old;
         left_in += mid_move;        // right += p;
         left_out += left_move;      // left += rem;
         left += left_in;            // sum += right;
         left_in -= left_move;        // right -= rem;
 
+        // Right side follows a similar pattern, but is parallel
+
+        right_out -= pre_mid_move;
+        right_in += p;
+        right_out += right_move;
+        right += right_in;
+        right_in -= right_move;
+
+        quad += right;
+
         console.log(
-            'p', left_limit, left_mid, mid, right_mid, right_limit,
-            'v', left_move, mid_move,
-            'left:', left, 'left_in:', left_in, 'left_out:', left_out, 
-            format_subseq(buffer, left_limit, left_mid),
-            format_subseq(buffer, left_mid, mid),
-            format_subseq(buffer, mid, right_mid),
-            format_subseq(buffer, right_mid, right_limit)
+            quad / weight, left, right,
+            // 'p', left_limit, left_mid, mid, right_mid, right_limit,
+            // 'v', left_move, mid_move,
+            // 'left:', left, 'left_in:', left_in, 'left_out:', left_out, 
+            // 'v', mid_move, right_move, p,
+            // 'right:', right, 'right_in:', right_in, 'right_out:', right_out, 
+            // format_subseq(buffer, left_limit, left_mid),
+            // format_subseq(buffer, left_mid, mid),
+            // format_subseq(buffer, mid, right_mid),
+            // format_subseq(buffer, right_mid, right_limit)
         );
 
+        quad -= left;
         left -= left_out;           // sum -= left;
+        right -= right_out;         // sum -= left;
     }
 }
 
