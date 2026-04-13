@@ -109,14 +109,14 @@ function quadratic_blur(data, radius) {
 
         left_out -= old;
         left_in += buffer[mid];                // right += p;
-        left_out += buffer[left_out_end];      // left += rem;
         left += left_in;                       // sum += right;
+        left_out += buffer[left_out_end];      // left += rem;
         left_in -= buffer[left_in_start];      // right -= rem;
 
         right_out -= buffer[mid - 1];
         right_in += p;
-        right_out += buffer[right_out_end];
         right += right_in;
+        right_out += buffer[right_out_end];
         right_in -= buffer[right_in_start];
 
         quad += right;
