@@ -12,6 +12,10 @@ const DATA = [
     0, 0, 0, 0, 0, 10, 0, 0, 10, 20, 15, 11, 12, 5, 0, 0, 0, 0, 0, 0, 20, 10, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 
+const EDGE_DATA = [
+    0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+];
+
 function stack_blur(data) {
     const buffer = new Array(BUFFER_SIZE).fill(0);
     
@@ -65,10 +69,10 @@ function format_subseq(a, start, end) {
     return "{" + a.slice(start, end + 1).join(",") + "}";
 }
 
-function quadratic_blur(data) {
-    const buffer = new Array(BUFFER_SIZE).fill(0);
+function quadratic_blur(data, radius) {
+    const buffer = new Array(2 * radius + 1).fill(0);
 
-    const width = RADIUS + 1;
+    const width = radius + 1;
     const acc_width = (width) >> 1;
     const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
@@ -80,8 +84,8 @@ function quadratic_blur(data) {
     // in and out are coded as follows:
     // left_out, left_in, right_out, right_in
 
-    let mid = RADIUS;
-    let right_limit = 2 * RADIUS;
+    let mid = radius;
+    let right_limit = 2 * radius;
     let left_limit = 0;
     let left_mid = left_limit + acc_width;
     let right_mid = right_limit - acc_width;
@@ -99,8 +103,8 @@ function quadratic_blur(data) {
         // That is not an issue. Start with the lefts alone.
 
         let left_move = buffer[left_mid];
-        let mid_move = buffer[RADIUS];
-        let pre_mid_move = buffer[RADIUS - 1];
+        let mid_move = buffer[radius];
+        let pre_mid_move = buffer[radius - 1];
         let right_move = buffer[right_mid];
         
         left_out -= old;
@@ -120,7 +124,7 @@ function quadratic_blur(data) {
         quad += right;
 
         console.log(
-            quad / weight, left, right,
+            new Number(quad / weight).toFixed(2),
             // 'p', left_limit, left_mid, mid, right_mid, right_limit,
             // 'v', left_move, mid_move,
             // 'left:', left, 'left_in:', left_in, 'left_out:', left_out, 
@@ -138,4 +142,4 @@ function quadratic_blur(data) {
     }
 }
 
-quadratic_blur(DATA);
+quadratic_blur(EDGE_DATA, 5);
