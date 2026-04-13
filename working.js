@@ -69,6 +69,12 @@ function format_subseq(a, start, end) {
     return "{" + a.slice(start, end + 1).join(",") + "}";
 }
 
+// Handle buffer wrapping -- assuming x is within bounds.
+// This is an alternative to modulo/remainder
+function wrap(x, limit) {
+    return x - (x > limit ? limit : 0);
+}
+
 function quadratic_blur(data, radius) {
     const buffer = new Array(2 * radius + 1).fill(0);
 
