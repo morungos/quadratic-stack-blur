@@ -73,7 +73,7 @@ function quadratic_blur(data, radius) {
     const buffer = new Array(2 * radius + 1).fill(0);
 
     const width = radius + 1;
-    const acc_width = (width) >> 1;
+    const acc_width = (radius) >> 1;
     const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
     let left = 0, right = 0;
@@ -87,10 +87,12 @@ function quadratic_blur(data, radius) {
     let mid = radius;
     let right_limit = 2 * radius;
     let left_limit = 0;
-    let left_mid = left_limit + acc_width;
-    let right_mid = right_limit - acc_width;
+    let left_out_end = left_limit + acc_width;
+    let left_in_start = mid - acc_width;
+    let right_out_end = mid + acc_width;
+    let right_in_start = right_limit - acc_width;
 
-    console.log(`acc_width=${acc_width}, left_limit=${left_limit}, left_mid=${left_mid}, mid=${mid}, right_mid=${right_mid}, right_limit=${right_limit}`)
+    // console.log(`acc_width=${acc_width}, left_limit=${left_limit}, left_out_end=${left_out_end}, mid=${mid}, right_mid=${right_mid}, right_limit=${right_limit}`)
     
     for(let i = 0; i < data.length; i++) {
 
@@ -104,24 +106,22 @@ function quadratic_blur(data, radius) {
         // their own small stack blurs, although they won't be symmetric.
         // That is not an issue. Start with the lefts alone.
 
-        let left_move = buffer[left_mid];
-        let mid_move = buffer[mid];
-        let pre_mid_move = buffer[mid - 1];
-        let right_move = buffer[right_mid];
+        // let left_move = buffer[left_mid];
+        // let right_move = buffer[right_mid];
         
         left_out -= old;
-        left_in += mid_move;        // right += p;
-        left_out += left_move;      // left += rem;
-        left += left_in;            // sum += right;
-        left_in -= left_move;       // right -= rem;
+        left_in += buffer[mid];                // right += p;
+        left_out += buffer[left_out_end];      // left += rem;
+        left += left_in;                       // sum += right;
+        left_in -= buffer[left_in_start];      // right -= rem;
 
         // Right side follows a similar pattern, but is parallel
 
-        right_out -= pre_mid_move;
+        right_out -= buffer[mid - 1];
         right_in += p;
-        right_out += right_move;
+        right_out += buffer[right_out_end];
         right += right_in;
-        right_in -= right_move;
+        right_in -= buffer[right_in_start];
 
         quad += right;
 
@@ -129,15 +129,15 @@ function quadratic_blur(data, radius) {
             new Number(quad / weight).toFixed(2),
             // 'p', left_limit, left_mid, mid, right_mid, right_limit,
             // 'v', left_move, mid_move,
-            'left:', left, 'left_in:', left_in, 'left_out:', left_out, 
-            'right:', right, 'right_in:', right_in, 'right_out:', right_out, 
+            // 'left:', left, 'left_in:', left_in, 'left_out:', left_out, 
+            // 'right:', right, 'right_in:', right_in, 'right_out:', right_out, 
             // 'left:', left, 'left_in:', left_in, 'left_out:', left_out, 
             // 'v', mid_move, right_move, p,
             // 'right:', right, 'right_in:', right_in, 'right_out:', right_out, 
-            format_subseq(buffer, left_limit, left_mid),
-            format_subseq(buffer, left_mid, mid),
-            format_subseq(buffer, mid, right_mid),
-            format_subseq(buffer, right_mid, right_limit)
+            // format_subseq(buffer, left_limit, left_out_end),
+            // format_subseq(buffer, left_in_start, mid),
+            // format_subseq(buffer, mid, right_out_end),
+            // format_subseq(buffer, right_in_start, right_limit)
         );
 
         quad -= left;
