@@ -99,7 +99,9 @@ function quadratic_blur(data, radius) {
 
         let p = data[i];
 
-        // Get the old value and remove it, replacing with the new
+        // Get the old value and remove it, pushing the new to the end of
+        // the queue.
+        
         let old = buffer.shift();
         buffer.push(p);
 
