@@ -87,18 +87,13 @@ function quadratic_blur(data, radius) {
     let right_in = 0, right_out = 0;
     let quad = 0;
 
-    // in and out are coded as follows:
-    // left_out, left_in, right_out, right_in
-
     let mid = radius;
-    let right_limit = 2 * radius;
+    let right_limit = radius << 1;
     let left_limit = 0;
     let left_out_end = left_limit + acc_width;
     let left_in_start = mid - acc_width;
     let right_out_end = mid + acc_width;
     let right_in_start = right_limit - acc_width;
-
-    // console.log(`acc_width=${acc_width}, left_limit=${left_limit}, left_out_end=${left_out_end}, mid=${mid}, right_mid=${right_mid}, right_limit=${right_limit}`)
     
     for(let i = 0; i < data.length; i++) {
 
@@ -112,16 +107,11 @@ function quadratic_blur(data, radius) {
         // their own small stack blurs, although they won't be symmetric.
         // That is not an issue. Start with the lefts alone.
 
-        // let left_move = buffer[left_mid];
-        // let right_move = buffer[right_mid];
-        
         left_out -= old;
         left_in += buffer[mid];                // right += p;
         left_out += buffer[left_out_end];      // left += rem;
         left += left_in;                       // sum += right;
         left_in -= buffer[left_in_start];      // right -= rem;
-
-        // Right side follows a similar pattern, but is parallel
 
         right_out -= buffer[mid - 1];
         right_in += p;
