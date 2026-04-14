@@ -112,18 +112,18 @@ function quadratic_blur(data, radius) {
 
     // The core update function, decoupled from data access and from writing.
     
-    const update = (rem, add, gen) => {
+    const update = (rem, add, read, gen) => {
         left_out -= rem;
-        left_in += getBuffer(mid);                // right += p;
+        left_in += read(mid);                // right += p;
         left += left_in;                       // sum += right;
-        left_out += getBuffer(left_out_end);      // left += rem;
-        left_in -= getBuffer(left_in_start);      // right -= rem;
+        left_out += read(left_out_end);      // left += rem;
+        left_in -= read(left_in_start);      // right -= rem;
 
-        right_out -= getBuffer(mid - 1);
+        right_out -= read(mid - 1);
         right_in += add;
         right += right_in;
-        right_out += getBuffer(right_out_end);
-        right_in -= getBuffer(right_in_start);
+        right_out += read(right_out_end);
+        right_in -= read(right_in_start);
 
         quad += right;
 
@@ -148,8 +148,8 @@ function quadratic_blur(data, radius) {
         buffer[bi] = p;
         bi = new_bi;
 
-        update(old, p, (v) => console.log("step3", new Number(v).toFixed(2), `left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
+        update(old, p, getBuffer, (v) => console.log("step3", new Number(v).toFixed(2), `i=${i}, p=${p}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
     }
 }
 
-quadratic_blur(DATA, 5);
+quadratic_blur(EDGE_DATA, 5);
