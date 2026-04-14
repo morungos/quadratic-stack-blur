@@ -13,7 +13,7 @@ const DATA = [
 ];
 
 const EDGE_DATA = [
-    10, 4, 3, 2, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 
 function stack_blur(data) {
@@ -107,6 +107,7 @@ function quadratic_blur(data, radius) {
     const getBuffer = (i) => {
         const index = wrap(bi + i, buffer_size);
         const v = buffer[index];
+        // console.log(`read i=${i}, v=${v}`)
         return v;
     };
 
@@ -134,8 +135,35 @@ function quadratic_blur(data, radius) {
         right -= right_out;         // sum -= left;
     };
 
-    // The main data traverse, across the pixels. 
-    for(let i = 0; i < data.length; i++) {
+    // Step 1.
+    buffer[mid] = data[0];
+    for(let i = 0; i < radius + 1; i++) {
+        buffer[mid - i] = buffer[mid + i] = data[i];
+    }
+    console.log("step1", "{" + buffer.join(",") + "}");
+
+    // Step 2. Initialize the rolling sums without writing, and flagging
+    // buffer accesses to the right of `i` as zero. For this reason, our
+    // buffer access function needs to be passed in.
+
+    const initialRead = (i, j) => {
+        const v = (i+j+1 < buffer_size ) ? 0 : buffer[(i+j+1) - buffer_size];
+        // console.log(`read i=${i}, j=${j}, v=${v}`)
+        return v;
+    }
+
+    for(let i = 0; i < 2 * radius; i++) {
+        let p = buffer[i];
+        update(0, p, (j) => initialRead(i, j), (v) => console.log("step2", new Number(v).toFixed(2), `i=${i}, p=${p}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
+    }
+
+    bi = 2 * radius;
+
+    // Step 3. The main data traverse, across the pixels. The output trails the
+    // input by `radius+1`. Therefore, for the starting edge, we need to preload
+    // `2*radius` values, but for symmetry, let's just fill the buffer.
+
+    for(let i = radius + 1; i < data.length; i++) {
 
         let p = data[i];
 
@@ -148,7 +176,7 @@ function quadratic_blur(data, radius) {
         buffer[bi] = p;
         bi = new_bi;
 
-        update(old, p, getBuffer, (v) => console.log("step3", new Number(v).toFixed(2), `i=${i}, p=${p}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
+        update(old, p, getBuffer, (v) => console.log("step3", new Number(v).toFixed(2), `i=${i}, p=${p}, old=${old}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
     }
 }
 
