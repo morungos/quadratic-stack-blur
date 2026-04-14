@@ -1,51 +1,3 @@
-// Working file for the stack blur
-
-const RADIUS = 2;
-const WIDTH = RADIUS + 1;
-const BUFFER_SIZE = 2 * RADIUS + 1;
-const ACC_WIDTH = Math.floor((WIDTH + 1) / 2);
-const WEIGHT = ACC_WIDTH * (WIDTH - ACC_WIDTH) * WIDTH;
-
-// To start, assume we are zero to infinity
-
-const DATA = [
-    0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-];
-
-const EDGE_DATA = [
-    10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10
-];
-
-function stack_blur(data) {
-    const buffer = new Array(BUFFER_SIZE).fill(0);
-    
-    let left = 0, right = 0;
-    let sum = 0;
-    for(let i = 0; i < data.length; i++) {
-
-        let p = data[i];
-
-        // Get the old value and remove it, replacing with the new
-        let old = buffer.shift();
-        buffer.push(p);
-        left -= old;
-
-        // Pick mid point, remove from right and add to left
-        let rem = buffer[RADIUS];
-        right += p;
-        left += rem;
-        sum += right;
-        right -= rem;
-
-        // Output
-        console.log(new Number(sum / (WIDTH * WIDTH)).toFixed(2), sum, left, right, "{ " + buffer.join(", ") + "}");
-        
-        sum -= left;
-    }
-}
-
-// stack_blur(DATA);
-
 /**
  * The primary difference between a regular stack blur and a quadratic one is
  * that we need to have four main blocks, rather than two, and an additional
@@ -65,9 +17,21 @@ function stack_blur(data) {
  * should be able to process them in a single pass over the edge.
  */
 
-function format_subseq(a, start, end) {
-    return "{" + a.slice(start, end + 1).join(",") + "}";
-}
+const RADIUS = 2;
+const WIDTH = RADIUS + 1;
+const BUFFER_SIZE = 2 * RADIUS + 1;
+const ACC_WIDTH = Math.floor((WIDTH + 1) / 2);
+const WEIGHT = ACC_WIDTH * (WIDTH - ACC_WIDTH) * WIDTH;
+
+// To start, assume we are zero to infinity
+
+const DATA = [
+    0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+];
+
+const EDGE_DATA = [
+    0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10
+];
 
 // Handle buffer wrapping -- assuming x is within bounds.
 // This is an alternative to modulo/remainder
@@ -142,7 +106,7 @@ function quadratic_blur(data, radius) {
 
     // Step 1.
     buffer[mid] = data[0];
-    for(let i = 0; i < width; i++) {
+    for(let i = 1; i < width; i++) {
         buffer[mid - i] = buffer[mid + i] = data[i];
     }
 
@@ -156,18 +120,21 @@ function quadratic_blur(data, radius) {
         return v;
     }
 
-    for(let i = 0; i < 2 * radius; i++) {
+    for(let i = 0; i < 2 * radius + 1; i++) {
         let p = buffer[i];
-        update(0, p, (j) => initialRead(i, j), (v) => console.log("step2", new Number(v).toFixed(2), `i=${i}, p=${p}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
+        update(0, p, (j) => initialRead(i, j), (v) => {
+            // console.log("step2", new Number(v).toFixed(2), `i=${i}, p=${p}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}");
+        });
     }
 
-    bi = 2 * radius;
+    bi = 0;
+    // console.log(`step2 left=${left}, right=${right}`)
 
     // Step 3. The main data traverse, across the pixels. The output trails the
     // input by `radius+1`. Therefore, for the starting edge, we need to preload
     // `2*radius` values, but for symmetry, let's just fill the buffer.
 
-    for(let i = width; i < data.length; i++) {
+    for(let i = radius; i < data.length; i++) {
 
         let p = data[i];
 
