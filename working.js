@@ -9,11 +9,11 @@ const WEIGHT = ACC_WIDTH * (WIDTH - ACC_WIDTH) * WIDTH;
 // To start, assume we are zero to infinity
 
 const DATA = [
-    0, 0, 0, 0, 0, 10, 0, 0, 10, 20, 15, 11, 12, 5, 0, 0, 0, 0, 0, 0, 20, 10, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 
 const EDGE_DATA = [
-    0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    10, 4, 3, 2, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 
 function stack_blur(data) {
@@ -72,7 +72,7 @@ function format_subseq(a, start, end) {
 // Handle buffer wrapping -- assuming x is within bounds.
 // This is an alternative to modulo/remainder
 function wrap(x, limit) {
-    return x - (x > limit ? limit : 0);
+    return x - (x >= limit ? limit : 0);
 }
 
 // Edge handling. Due to the way we sum sums, we cannot really compute by any
@@ -81,7 +81,8 @@ function wrap(x, limit) {
 // the update from data generation.
 
 function quadratic_blur(data, radius) {
-    const buffer = new Array(2 * radius + 1).fill(0);
+    const buffer_size = 2 * radius + 1;
+    const buffer = new Array(buffer_size).fill(0);
 
     const width = radius + 1;
     const acc_width = (radius) >> 1;
@@ -123,7 +124,8 @@ function quadratic_blur(data, radius) {
         left -= left_out;           // sum -= left;
         right -= right_out;         // sum -= left;
     };
-    
+
+    // The main data traverse, across the pixels. 
     for(let i = 0; i < data.length; i++) {
 
         let p = data[i];
@@ -134,8 +136,8 @@ function quadratic_blur(data, radius) {
         let old = buffer.shift();
         buffer.push(p);
 
-        update(old, p, (v) => console.log(new Number(v).toFixed(2)));
+        update(old, p, (v) => console.log("step3", new Number(v).toFixed(2), left, right, "{" + buffer.join(",") + "}"));
     }
 }
 
-quadratic_blur(EDGE_DATA, 5);
+quadratic_blur(DATA, 5);
