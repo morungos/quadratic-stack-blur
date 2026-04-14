@@ -11,17 +11,21 @@ function stack_blur(data) {
     
     let left = 0, right = 0;
     let sum = 0;
+    let bi = 0;
     for(let i = 0; i < data.length; i++) {
 
         let p = data[i];
 
+        let old = buffer[bi];
+        buffer[bi] = p;
+        bi = bi == BUFFER_SIZE - 1 ? 0 : bi + 1;
+
         // Get the old value and remove it, replacing with the new
-        let old = buffer.shift();
-        buffer.push(p);
         left -= old;
 
         // Pick mid point, remove from right and add to left
-        let rem = buffer[RADIUS];
+        let next = bi + 1 == BUFFER_SIZE ? 0 : bi + 1;
+        let rem = buffer[next];
         right += p;
         left += rem;
         sum += right;
