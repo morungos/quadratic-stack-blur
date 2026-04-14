@@ -13,7 +13,7 @@ const DATA = [
 ];
 
 const EDGE_DATA = [
-    10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10
 ];
 
 function stack_blur(data) {
@@ -177,6 +177,21 @@ function quadratic_blur(data, radius) {
         bi = new_bi;
 
         update(old, p, getBuffer, (v) => console.log("step3", new Number(v).toFixed(2), `i=${i}, p=${p}, old=${old}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
+    }
+
+    console.log(`step 4`, bi, "{" + buffer.join(",") + "}")
+
+    for(let i = 0; i < radius; i++) {
+        // Read a value backwards
+        const ix = wrap(buffer_size + bi - 2*(i + 1), buffer_size);
+        const p = buffer[ix];
+
+        let new_bi = wrap(bi + 1, buffer_size);
+        let old = buffer[bi];
+        buffer[bi] = p;
+        bi = new_bi;
+
+        update(old, p, getBuffer, (v) => console.log("step4", new Number(v).toFixed(2), `i=${i}, p=${p}, old=${old}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
     }
 }
 
