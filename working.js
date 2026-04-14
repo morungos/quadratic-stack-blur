@@ -75,6 +75,11 @@ function wrap(x, limit) {
     return x - (x > limit ? limit : 0);
 }
 
+// Edge handling. Due to the way we sum sums, we cannot really compute by any
+// sensible method other than actually working through the data. Fortunately,
+// our main update step is relatively simple. Mainly, it is a case of decoupling
+// the update from data generation.
+
 function quadratic_blur(data, radius) {
     const buffer = new Array(2 * radius + 1).fill(0);
 
@@ -94,6 +99,30 @@ function quadratic_blur(data, radius) {
     let left_in_start = mid - acc_width;
     let right_out_end = mid + acc_width;
     let right_in_start = right_limit - acc_width;
+
+    // The core update function, decoupled from data access and from writing.
+    
+    const update = (rem, add, gen) => {
+        left_out -= rem;
+        left_in += buffer[mid];                // right += p;
+        left += left_in;                       // sum += right;
+        left_out += buffer[left_out_end];      // left += rem;
+        left_in -= buffer[left_in_start];      // right -= rem;
+
+        right_out -= buffer[mid - 1];
+        right_in += add;
+        right += right_in;
+        right_out += buffer[right_out_end];
+        right_in -= buffer[right_in_start];
+
+        quad += right;
+
+        gen(quad / weight);
+
+        quad -= left;
+        left -= left_out;           // sum -= left;
+        right -= right_out;         // sum -= left;
+    };
     
     for(let i = 0; i < data.length; i++) {
 
@@ -101,46 +130,11 @@ function quadratic_blur(data, radius) {
 
         // Get the old value and remove it, pushing the new to the end of
         // the queue.
-        
+
         let old = buffer.shift();
         buffer.push(p);
 
-        // Now the counts. We want the left and rights to be effectively
-        // their own small stack blurs, although they won't be symmetric.
-        // That is not an issue. Start with the lefts alone.
-
-        left_out -= old;
-        left_in += buffer[mid];                // right += p;
-        left += left_in;                       // sum += right;
-        left_out += buffer[left_out_end];      // left += rem;
-        left_in -= buffer[left_in_start];      // right -= rem;
-
-        right_out -= buffer[mid - 1];
-        right_in += p;
-        right += right_in;
-        right_out += buffer[right_out_end];
-        right_in -= buffer[right_in_start];
-
-        quad += right;
-
-        console.log(
-            new Number(quad / weight).toFixed(2),
-            // 'p', left_limit, left_mid, mid, right_mid, right_limit,
-            // 'v', left_move, mid_move,
-            // 'left:', left, 'left_in:', left_in, 'left_out:', left_out, 
-            // 'right:', right, 'right_in:', right_in, 'right_out:', right_out, 
-            // 'left:', left, 'left_in:', left_in, 'left_out:', left_out, 
-            // 'v', mid_move, right_move, p,
-            // 'right:', right, 'right_in:', right_in, 'right_out:', right_out, 
-            // format_subseq(buffer, left_limit, left_out_end),
-            // format_subseq(buffer, left_in_start, mid),
-            // format_subseq(buffer, mid, right_out_end),
-            // format_subseq(buffer, right_in_start, right_limit)
-        );
-
-        quad -= left;
-        left -= left_out;           // sum -= left;
-        right -= right_out;         // sum -= left;
+        update(old, p, (v) => console.log(new Number(v).toFixed(2)));
     }
 }
 
