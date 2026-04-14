@@ -72,7 +72,8 @@ function format_subseq(a, start, end) {
 // Handle buffer wrapping -- assuming x is within bounds.
 // This is an alternative to modulo/remainder
 function wrap(x, limit) {
-    return x - (x >= limit ? limit : 0);
+    let r = x - (x >= limit ? limit : 0);
+    return r;
 }
 
 // Edge handling. Due to the way we sum sums, we cannot really compute by any
@@ -88,6 +89,8 @@ function quadratic_blur(data, radius) {
     const acc_width = (radius) >> 1;
     const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
+    let bi = 0;
+
     let left = 0, right = 0;
     let left_in = 0, left_out = 0;
     let right_in = 0, right_out = 0;
@@ -101,20 +104,26 @@ function quadratic_blur(data, radius) {
     let right_out_end = mid + acc_width;
     let right_in_start = right_limit - acc_width;
 
+    const getBuffer = (i) => {
+        const index = wrap(bi + i, buffer_size);
+        const v = buffer[index];
+        return v;
+    };
+
     // The core update function, decoupled from data access and from writing.
     
     const update = (rem, add, gen) => {
         left_out -= rem;
-        left_in += buffer[mid];                // right += p;
+        left_in += getBuffer(mid);                // right += p;
         left += left_in;                       // sum += right;
-        left_out += buffer[left_out_end];      // left += rem;
-        left_in -= buffer[left_in_start];      // right -= rem;
+        left_out += getBuffer(left_out_end);      // left += rem;
+        left_in -= getBuffer(left_in_start);      // right -= rem;
 
-        right_out -= buffer[mid - 1];
+        right_out -= getBuffer(mid - 1);
         right_in += add;
         right += right_in;
-        right_out += buffer[right_out_end];
-        right_in -= buffer[right_in_start];
+        right_out += getBuffer(right_out_end);
+        right_in -= getBuffer(right_in_start);
 
         quad += right;
 
@@ -131,12 +140,15 @@ function quadratic_blur(data, radius) {
         let p = data[i];
 
         // Get the old value and remove it, pushing the new to the end of
-        // the queue.
+        // the queue. The old value is at the end of the buffer, and since we
+        // write backwards, that is one below the current bi.
 
-        let old = buffer.shift();
-        buffer.push(p);
+        let new_bi = wrap(bi + 1, buffer_size);
+        let old = buffer[bi];
+        buffer[bi] = p;
+        bi = new_bi;
 
-        update(old, p, (v) => console.log("step3", new Number(v).toFixed(2), left, right, "{" + buffer.join(",") + "}"));
+        update(old, p, (v) => console.log("step3", new Number(v).toFixed(2), `left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
     }
 }
 
