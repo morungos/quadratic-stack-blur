@@ -89,6 +89,10 @@ function quadratic_blur(data, radius) {
     const acc_width = (radius) >> 1;
     const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
+    const write = (x, v) => {
+        console.log("write", x, v, data[x])
+    };
+
     let bi = 0;
 
     let left = 0, right = 0;
@@ -103,6 +107,7 @@ function quadratic_blur(data, radius) {
     let left_in_start = mid - acc_width;
     let right_out_end = mid + acc_width;
     let right_in_start = right_limit - acc_width;
+    let o = 0;
 
     const getBuffer = (i) => {
         const index = wrap(bi + i, buffer_size);
@@ -137,10 +142,9 @@ function quadratic_blur(data, radius) {
 
     // Step 1.
     buffer[mid] = data[0];
-    for(let i = 0; i < radius + 1; i++) {
+    for(let i = 0; i < width; i++) {
         buffer[mid - i] = buffer[mid + i] = data[i];
     }
-    console.log("step1", "{" + buffer.join(",") + "}");
 
     // Step 2. Initialize the rolling sums without writing, and flagging
     // buffer accesses to the right of `i` as zero. For this reason, our
@@ -163,7 +167,7 @@ function quadratic_blur(data, radius) {
     // input by `radius+1`. Therefore, for the starting edge, we need to preload
     // `2*radius` values, but for symmetry, let's just fill the buffer.
 
-    for(let i = radius + 1; i < data.length; i++) {
+    for(let i = width; i < data.length; i++) {
 
         let p = data[i];
 
@@ -176,10 +180,11 @@ function quadratic_blur(data, radius) {
         buffer[bi] = p;
         bi = new_bi;
 
-        update(old, p, getBuffer, (v) => console.log("step3", new Number(v).toFixed(2), `i=${i}, p=${p}, old=${old}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
+        update(old, p, getBuffer, (v) => {
+            write(o++, v);
+            // console.log("step3", new Number(v).toFixed(2), `i=${i}, p=${p}, old=${old}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}");
+        });
     }
-
-    console.log(`step 4`, bi, "{" + buffer.join(",") + "}")
 
     for(let i = 0; i < radius; i++) {
         // Read a value backwards
@@ -191,7 +196,10 @@ function quadratic_blur(data, radius) {
         buffer[bi] = p;
         bi = new_bi;
 
-        update(old, p, getBuffer, (v) => console.log("step4", new Number(v).toFixed(2), `i=${i}, p=${p}, old=${old}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}"));
+        update(old, p, getBuffer, (v) => {
+            write(o++, v);
+            // console.log("step4", new Number(v).toFixed(2), `i=${i}, p=${p}, old=${old}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}");
+        });
     }
 }
 
