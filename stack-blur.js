@@ -32,7 +32,7 @@ function stack_blur(data) {
         
         sum -= left;
 
-        console.log(new Number(value).toFixed(2), sum, left, right, "{ " + buffer.join(", ") + "}");
+        console.log(new Number(value).toFixed(2), p, sum, left, right, "{ " + buffer.join(", ") + "}");
     }
 }
 
