@@ -17,14 +17,6 @@
  * should be able to process them in a single pass over the edge.
  */
 
-const RADIUS = 2;
-const WIDTH = RADIUS + 1;
-const BUFFER_SIZE = 2 * RADIUS + 1;
-const ACC_WIDTH = Math.floor((WIDTH + 1) / 2);
-const WEIGHT = ACC_WIDTH * (WIDTH - ACC_WIDTH) * WIDTH;
-
-// To start, assume we are zero to infinity
-
 const DATA = [
     0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];

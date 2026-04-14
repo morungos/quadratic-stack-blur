@@ -15,4 +15,7 @@ https://observablehq.com/@jobleonard/mario-klingemans-stackblur, which covers
 the stack blur well, and the quadratic stack blur a little. 
 
 Note that the one main distinction is that we need a specific edge model,
-reflection, which is not what the sample code uses.
+reflection, which is not what all the sample code that I've found tends to use.
+
+The aim is to build an efficient quadratic stack blur in plain C, with a good
+edge model.
