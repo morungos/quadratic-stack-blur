@@ -1,3 +1,11 @@
+const RADIUS = 1;
+const WIDTH = RADIUS + 1;
+const BUFFER_SIZE = 2 * RADIUS + 1;
+
+const DATA = [
+    0, 0, 0, 0, 0, 1, 8, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+];
+
 function stack_blur(data) {
     const buffer = new Array(BUFFER_SIZE).fill(0);
     
@@ -20,11 +28,13 @@ function stack_blur(data) {
         right -= rem;
 
         // Output
-        console.log(new Number(sum / (WIDTH * WIDTH)).toFixed(2), sum, left, right, "{ " + buffer.join(", ") + "}");
+        const value = sum / (WIDTH * WIDTH);
         
         sum -= left;
+
+        console.log(new Number(value).toFixed(2), sum, left, right, "{ " + buffer.join(", ") + "}");
     }
 }
 
-// stack_blur(DATA);
+stack_blur(DATA);
 
