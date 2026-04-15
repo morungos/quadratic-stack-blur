@@ -28,7 +28,7 @@ bool read_pgm(const char *full_path, ImageData *data) {
     size_t ret;
     size_t index = 0;
     size_t limit = 0;
-    unsigned int maximum;
+    int maximum;
     while((ch = getc(input)) != EOF) {
         if (allocated && index == limit) {
             break;
@@ -52,7 +52,7 @@ bool read_pgm(const char *full_path, ImageData *data) {
                 }
                 // Now we can allocate a buffer
                 limit = data->width * data->height;
-                data->data = (unsigned char *) malloc(limit);
+                data->data = (uint8_t *) malloc(limit);
                 allocated = true;
                 index = 0;
                 break;
@@ -62,13 +62,13 @@ bool read_pgm(const char *full_path, ImageData *data) {
                     perror("Missing P2 header");
                     goto error;
                 }
-                unsigned int value;
+                int value;
                 ret = fscanf(input, "%u", &value);
                 if (ret != 1) {
                     perror("Failed to read value");
                     goto error;
                 }
-                data->data[index++] = (unsigned char) (value & 0xff);
+                data->data[index++] = (uint8_t) (value & 0xff);
         }
     }
     fclose(input);

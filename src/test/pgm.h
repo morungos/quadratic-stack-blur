@@ -3,11 +3,12 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct ImageData {
     size_t width;
     size_t height;
-    unsigned char *data;
+    uint8_t *data;
 } ImageData;
 
 #ifdef __cplusplus

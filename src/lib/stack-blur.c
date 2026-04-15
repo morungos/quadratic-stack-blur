@@ -13,6 +13,9 @@
  * 3. Use reflection at borders
  */
 
+#define TYPE uint8_t
+#define SUM_TYPE int
+
 #define MAX_RADIUS (5)
 
 #define INDEX_MID (r)
@@ -70,10 +73,10 @@ static inline int select(int a, int b, int c) {
  * @param count the length of the data to be blurred
  * @param r the radius of the blur function
  */
-void quadratic_stack_blur(int *data, size_t stride, size_t count, size_t r) {
+void quadratic_stack_blur(TYPE *data, size_t stride, size_t count, size_t r) {
 
     // Allow a buffer that's big enough
-    int buffer[(MAX_RADIUS << 1) + 1];
+    TYPE buffer[(MAX_RADIUS << 1) + 1];
 
     const int buffer_size = (r << 1) + 1;
     const int width = r + 1;
@@ -82,10 +85,10 @@ void quadratic_stack_blur(int *data, size_t stride, size_t count, size_t r) {
 
     int i, o = 0;
     int bi = 0;
-    int left = 0, right = 0;
-    int left_in = 0, left_out = 0;
-    int right_in = 0, right_out = 0;
-    int quad = 0;
+    SUM_TYPE left = 0, right = 0;
+    SUM_TYPE left_in = 0, left_out = 0;
+    SUM_TYPE right_in = 0, right_out = 0;
+    SUM_TYPE quad = 0;
 
 #define WRAP(index,limit) ((index) % limit)
 #define WRITE_DATA(v) (data[stride*o++] = v)
@@ -104,10 +107,10 @@ void quadratic_stack_blur(int *data, size_t stride, size_t count, size_t r) {
     }
 
     for(i = r; i < count; i++) {
-        int p = data[i*stride];
+        TYPE p = data[i*stride];
 
         int new_bi = WRAP(bi + 1, buffer_size);
-        int old = buffer[bi];
+        TYPE old = buffer[bi];
         buffer[bi] = p;
         bi = new_bi;
 
@@ -116,10 +119,10 @@ void quadratic_stack_blur(int *data, size_t stride, size_t count, size_t r) {
 
     for(i = 0; i < r; i++) {
         int bx = buffer_size + bi - 2*(i + 1);
-        int p = buffer[WRAP(bx, buffer_size)];
+        TYPE p = buffer[WRAP(bx, buffer_size)];
 
         int new_bi = WRAP(bi + 1, buffer_size);
-        int old = buffer[bi];
+        TYPE old = buffer[bi];
         buffer[bi] = p;
         bi = new_bi;
 
