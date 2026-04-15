@@ -6,7 +6,7 @@ import { decode, encode } from "fast-png";
 import { fromHex, toHex } from "uint8array-tools"
 
 import { quadraticStackBlur } from './quadratic-stack-blur';
-import { stackBlur } from './stack-blur';
+import { stackBlurOne } from './stack-blur';
 import { makeTables } from './integer-tables';
 
 describe('quadraticStackBlur', () => {
@@ -53,11 +53,11 @@ describe('quadraticStackBlur', () => {
 
 });
 
-describe('stackBlur', () => {
+describe('stackBlurOne', () => {
     it('simple test', () => {
         const data = fromHex("000000000000000203040a0403020000000000000000000000000000");
         const count = data.length;
-        stackBlur(data, 0, 1, count, 1);
+        stackBlurOne(data, 0, 1, count);
         expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
     });
 })

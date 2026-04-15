@@ -1,7 +1,7 @@
-export function stackBlur(data: Uint8Array, origin: number, stride: number, count: number, radius: number) {
+export function stackBlurOne(data: Uint8Array, origin: number, stride: number, count: number) {
 
-    const width = radius + 1;
-    const buffer_size = 2 * radius + 1;
+    const width = 2;
+    const buffer_size = 2 * 1 + 1;
     const weight = (width * width);
 
     const buffer = new Array(buffer_size).fill(0);
