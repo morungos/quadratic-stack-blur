@@ -15,11 +15,6 @@
 
 #define MAX_RADIUS (5)
 
-#define WRITE_DATA(v) (data[stride*o++] = v)
-#define WRITE_DUMMY(v) ;
-
-#define GET_BUFFER(i) buffer[]
-
 #define INDEX_MID (r)
 #define INDEX_LEFT_LIMIT (0)
 #define INDEX_RIGHT_LIMIT (r << 1)
@@ -27,8 +22,6 @@
 #define INDEX_LEFT_IN_START (INDEX_MID - acc_width)
 #define INDEX_RIGHT_OUT_END (INDEX_MID + acc_width)
 #define INDEX_RIGHT_IN_START (INDEX_RIGHT_LIMIT - acc_width)
-
-#define WRAP(index,limit) (index % limit)
 
 #define INITIAL_BUFFER(i) i
 
@@ -87,12 +80,17 @@ void quadratic_stack_blur(int *data, size_t stride, size_t count, size_t r) {
     const int acc_width = r >> 1;
     const int weight = acc_width * (width - acc_width + 1) * (width + 1);
 
-    int i;
+    int i, o = 0;
     int bi = 0;
     int left = 0, right = 0;
     int left_in = 0, left_out = 0;
     int right_in = 0, right_out = 0;
     int quad = 0;
+
+#define WRAP(index,limit) ((index) % limit)
+#define WRITE_DATA(v) (data[stride*o++] = v)
+#define WRITE_DUMMY(v) ;
+#define GET_BUFFER(i) (buffer[WRAP(bi + i, buffer_size)])
 
     // Initialize the buffer
     buffer[r] = data[0];
@@ -105,4 +103,31 @@ void quadratic_stack_blur(int *data, size_t stride, size_t count, size_t r) {
         UPDATE(0, buffer[i], INITIAL_BUFFER, WRITE_DUMMY);
     }
 
+    for(i = r; i < count; i++) {
+        int p = data[i*stride];
+
+        int new_bi = WRAP(bi + 1, buffer_size);
+        int old = buffer[bi];
+        buffer[bi] = p;
+        bi = new_bi;
+
+        UPDATE(old, p, GET_BUFFER, WRITE_DATA);
+    }
+
+    for(i = 0; i < r; i++) {
+        int bx = buffer_size + bi - 2*(i + 1);
+        int p = buffer[WRAP(bx, buffer_size)];
+
+        int new_bi = WRAP(bi + 1, buffer_size);
+        int old = buffer[bi];
+        buffer[bi] = p;
+        bi = new_bi;
+
+        UPDATE(old, p, GET_BUFFER, WRITE_DATA);
+    }
+
+#undef WRAP
+#undef WRITE_DATA
+#undef WRITE_DUMMY
+#undef GET_BUFFER
 }
