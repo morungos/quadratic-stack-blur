@@ -11,6 +11,7 @@
     "fast-png": "^8.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
+    "uint8array-tools": "^0.0.9",
     "vitest": "^4.1.4"
   },
   "keywords": [],

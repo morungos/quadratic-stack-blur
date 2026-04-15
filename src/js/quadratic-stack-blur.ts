@@ -40,7 +40,7 @@ function wrap(x: number, limit: number) {
  * @param data 
  * @param radius 
  */
-function quadratic_blur(data: Array<number>, radius: number) {
+export function quadraticStackBlur(data: Uint8Array, origin: number, stride: number, count: number, radius: number) {
     const buffer_size = 2 * radius + 1;
     const buffer = new Array(buffer_size).fill(0);
 
@@ -49,7 +49,8 @@ function quadratic_blur(data: Array<number>, radius: number) {
     const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
     const write = (x: number, v: number) => {
-        console.log("write", x, v, data[x])
+        console.log("write", x, v, data[origin + x*stride])
+        data[origin + x*stride] = v;
     };
 
     let bi = 0;
@@ -100,9 +101,9 @@ function quadratic_blur(data: Array<number>, radius: number) {
     };
 
     // Step 1.
-    buffer[mid] = data[0];
+    buffer[mid] = data[origin];
     for(let i = 1; i < width; i++) {
-        buffer[mid - i] = buffer[mid + i] = data[i];
+        buffer[mid - i] = buffer[mid + i] = data[origin + i*stride];
     }
 
     // Step 2. Initialize the rolling sums without writing, and flagging
@@ -129,9 +130,9 @@ function quadratic_blur(data: Array<number>, radius: number) {
     // input by `radius+1`. Therefore, for the starting edge, we need to preload
     // `2*radius` values, but for symmetry, let's just fill the buffer.
 
-    for(let i = radius; i < data.length; i++) {
+    for(let i = radius; i < count; i++) {
 
-        let p = data[i];
+        let p = data[origin + i*stride];
 
         // Get the old value and remove it, pushing the new to the end of
         // the queue. The old value is at the end of the buffer, and since we
@@ -164,5 +165,3 @@ function quadratic_blur(data: Array<number>, radius: number) {
         });
     }
 }
-
-quadratic_blur(EDGE_DATA, 5);
