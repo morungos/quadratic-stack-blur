@@ -32,11 +32,14 @@ function wrap(x: number, limit: number) {
     return r;
 }
 
-// Edge handling. Due to the way we sum sums, we cannot really compute by any
-// sensible method other than actually working through the data. Fortunately,
-// our main update step is relatively simple. Mainly, it is a case of decoupling
-// the update from data generation.
-
+/**
+ * The core of the quadratic stack blur, in JavaScript. We implement this to work with
+ * an TypedBuffer or similar, and pass an initial index, a stride, and a count, to focus
+ * the effect within the buffer.
+ * 
+ * @param data 
+ * @param radius 
+ */
 function quadratic_blur(data: Array<number>, radius: number) {
     const buffer_size = 2 * radius + 1;
     const buffer = new Array(buffer_size).fill(0);

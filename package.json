@@ -9,10 +9,11 @@
   "devDependencies": {
     "@types/node": "^24.10.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "pngjs": "^7.0.0",
+    "vitest": "^4.1.4"
   },
   "dependencies": {
-    "vitest": "^4.1.4"
   },
   "keywords": [],
   "author": "Stuart Watt <morungos@gmail.com>",
