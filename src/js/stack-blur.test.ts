@@ -13,14 +13,14 @@ describe('quadratic stack blur', () => {
         const data = fromHex("000000000000000203040a0403020000000000000000000000000000");
         const count = data.length;
         quadraticStackBlur(data, 0, 1, count, 5);
-        expect(toHex(data)).toBe("00000000000001020303040303020100000000000000000000000000");
+        expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
     });
 
     it('simple test on edges', () => {
         const data = fromHex("0000000203040a040302000000000203040a040302000000000000000000000000000203040a");
         const count = data.length;
         quadraticStackBlur(data, 0, 1, count, 5);
-        expect(toHex(data)).toBe("0001020303040404030201010101020303040303020100000000000000000000000102030304");
+        expect(toHex(data)).toBe("0101020304040404030202010102020304040403020201000000000000000000010202030404");
     });
 
     it('basic stack blur', async () => {

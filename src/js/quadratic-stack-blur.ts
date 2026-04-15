@@ -41,7 +41,7 @@ export function quadraticStackBlur(data: Uint8Array, origin: number, stride: num
     const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
     const write = (x: number, v: number) => {
-        data[origin + x*stride] = v;
+        data[origin + x*stride] = Math.round(v);
     };
 
     let bi = 0;
