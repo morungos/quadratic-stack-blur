@@ -73,9 +73,9 @@ static inline int select(int a, int b, int c) {
 void quadratic_stack_blur(int *data, size_t stride, size_t count, size_t r) {
 
     // Allow a buffer that's big enough
-    int buffer[MAX_RADIUS << 1 + 1];
+    int buffer[(MAX_RADIUS << 1) + 1];
 
-    const int buffer_size = r << 1 + 1;
+    const int buffer_size = (r << 1) + 1;
     const int width = r + 1;
     const int acc_width = r >> 1;
     const int weight = acc_width * (width - acc_width + 1) * (width + 1);
