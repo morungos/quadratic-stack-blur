@@ -17,14 +17,6 @@
  * should be able to process them in a single pass over the edge.
  */
 
-const DATA = [
-    0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-];
-
-const EDGE_DATA = [
-    0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 2, 3, 4, 10, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 10
-];
-
 // Handle buffer wrapping -- assuming x is within bounds.
 // This is an alternative to modulo/remainder
 function wrap(x: number, limit: number) {
@@ -49,7 +41,6 @@ export function quadraticStackBlur(data: Uint8Array, origin: number, stride: num
     const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
     const write = (x: number, v: number) => {
-        console.log("write", x, v, data[origin + x*stride])
         data[origin + x*stride] = v;
     };
 
