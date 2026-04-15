@@ -88,3 +88,31 @@ ImageData get_pgm_data(const char *data_file) {
     return data;
 }
 
+/**
+ * It is also useful to be able to write image data, effectively using the
+ * same fprmat.
+ */
+
+#define PGM_ROW_SIZE (24)
+
+bool write_pgm_data(const char *data_file, ImageData data) {
+    FILE *output = fopen(data_file, "w");
+    if (! output) {
+        perror("File opening failed");
+        return false;
+    }
+
+    fprintf(output, "P2 %lu %lu %u\n", data.width, data.height, 255);
+
+    const int count = data.width * data.height;
+    for(int i = 0; i < count; i += PGM_ROW_SIZE) {
+        int end = i + PGM_ROW_SIZE > count ? count : i + PGM_ROW_SIZE;
+        for(int j = i; j < end; j++) {
+            fprintf(output, "%hhu ", data.data[j]);
+        }
+        fprintf(output, "\n");
+    }
+
+    fclose(output);
+    return true;
+}
