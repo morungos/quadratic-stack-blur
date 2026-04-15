@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <assert.h>
 
+#include "stack-blur.h"
+
 /**
  * Quadratic stack blur implementation.
  * 
@@ -12,9 +14,6 @@
  * 2. Minimal memory access
  * 3. Use reflection at borders
  */
-
-#define TYPE uint8_t
-#define SUM_TYPE int
 
 #define MAX_RADIUS (5)
 

@@ -19,7 +19,7 @@ add_compile_definitions(
 )
 
 target_include_directories(stack-blur-test PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../stackblur
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lib
 )
 
 target_link_libraries(stack-blur-test 
