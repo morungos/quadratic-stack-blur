@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "lib": [ "esnext", "dom" ],
+    "target": "esnext",
+    "moduleResolution": "node16",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",
+    "rootDir": "./src/js",
+  },
+  "include": [
+    "src/js/**/*.d.ts", 
+    "src/js/**/*.ts", 
+    "src/js/**/*.js"
+  ]
+}

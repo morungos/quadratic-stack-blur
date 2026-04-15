@@ -27,7 +27,7 @@ const EDGE_DATA = [
 
 // Handle buffer wrapping -- assuming x is within bounds.
 // This is an alternative to modulo/remainder
-function wrap(x, limit) {
+function wrap(x: number, limit: number) {
     let r = x - (x >= limit ? limit : 0);
     return r;
 }
@@ -37,7 +37,7 @@ function wrap(x, limit) {
 // our main update step is relatively simple. Mainly, it is a case of decoupling
 // the update from data generation.
 
-function quadratic_blur(data, radius) {
+function quadratic_blur(data: Array<number>, radius: number) {
     const buffer_size = 2 * radius + 1;
     const buffer = new Array(buffer_size).fill(0);
 
@@ -45,7 +45,7 @@ function quadratic_blur(data, radius) {
     const acc_width = (radius) >> 1;
     const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
-    const write = (x, v) => {
+    const write = (x: number, v: number) => {
         console.log("write", x, v, data[x])
     };
 
@@ -65,7 +65,7 @@ function quadratic_blur(data, radius) {
     let right_in_start = right_limit - acc_width;
     let o = 0;
 
-    const getBuffer = (i) => {
+    const getBuffer = (i: number) => {
         const index = wrap(bi + i, buffer_size);
         const v = buffer[index];
         // console.log(`read i=${i}, v=${v}`)
@@ -74,7 +74,7 @@ function quadratic_blur(data, radius) {
 
     // The core update function, decoupled from data access and from writing.
     
-    const update = (rem, add, read, gen) => {
+    const update = (rem: number, add: number, read: (i: number) => number, gen: (v: number) => void) => {
         left_out -= rem;
         left_in += read(mid);                // right += p;
         left += left_in;                       // sum += right;
@@ -106,7 +106,7 @@ function quadratic_blur(data, radius) {
     // buffer accesses to the right of `i` as zero. For this reason, our
     // buffer access function needs to be passed in.
 
-    const initialRead = (i, j) => {
+    const initialRead = (i: number, j: number) => {
         const v = (i+j+1 < buffer_size ) ? 0 : buffer[(i+j+1) - buffer_size];
         // console.log(`read i=${i}, j=${j}, v=${v}`)
         return v;

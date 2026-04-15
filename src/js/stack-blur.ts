@@ -6,12 +6,12 @@ const DATA = [
     0, 0, 0, 0, 0, 1, 8, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ];
 
-function stack_blur(data) {
+function stack_blur(data: Array<number>) {
     const buffer = new Array(BUFFER_SIZE).fill(0);
     
-    let left = 0, right = 0;
-    let sum = 0;
-    let bi = 0;
+    let left: number = 0, right: number = 0;
+    let sum: number = 0;
+    let bi: number = 0;
     for(let i = 0; i < data.length; i++) {
 
         let p = data[i];

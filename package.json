@@ -1,0 +1,21 @@
+{
+  "name": "quadratic-stack-blur",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "vitest": "^4.1.4"
+  },
+  "keywords": [],
+  "author": "Stuart Watt <morungos@gmail.com>",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.13.1"
+}
