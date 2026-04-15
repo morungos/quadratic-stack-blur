@@ -30,10 +30,15 @@ describe('quadratic stack blur', () => {
         const png = decode(data);
 
         // This is greyscale data, 1 byte per pixel.
+        const image = new Uint8Array(png.data.buffer);
 
-        png.data[0] = 12;
-        png.data[1] = 12;
-        png.data[3] = 12;
+        // Now we get do a more interesting test, at last
+        for(let y = 0; y < png.height; y++) {
+            quadraticStackBlur(image, y*png.width, 1, png.width, 5);
+        }
+        for(let x = 0; x < png.width; x++) {
+            quadraticStackBlur(image, x, png.width, png.height, 5);
+        }
 
         const buffer = encode(png);
         const output_file = path.join(__dirname, '..', '..', 'output.png')
