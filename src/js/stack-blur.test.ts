@@ -6,6 +6,7 @@ import { decode, encode } from "fast-png";
 import { fromHex, toHex } from "uint8array-tools"
 
 import { quadraticStackBlur } from './quadratic-stack-blur';
+import { makeTables } from './integer-tables';
 
 describe('quadratic stack blur', () => {
 
@@ -44,5 +45,9 @@ describe('quadratic stack blur', () => {
         const output_file = path.join(__dirname, '..', '..', 'output.png')
         fs.writeFileSync(output_file, buffer);
     });
+
+    it('test', () => {
+        makeTables();
+    })
 
 });
