@@ -1,0 +1,24 @@
+#ifndef CTEST_PGM_H
+#define CTEST_PGM_H
+
+#include <stdlib.h>
+#include <stdbool.h>
+
+typedef struct ImageData {
+    size_t width;
+    size_t height;
+    unsigned char *data;
+} ImageData;
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+bool read_pgm(const char *full_path, ImageData *data);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
