@@ -80,7 +80,8 @@ void quadratic_stack_blur(TYPE *data, size_t stride, size_t count, size_t r) {
     const int buffer_size = (r << 1) + 1;
     const int width = r + 1;
     const int acc_width = r >> 1;
-    const int weight = acc_width * (width - acc_width + 1) * (width + 1);
+    
+    const float weight = 1.0f / (acc_width * (width - acc_width + 1) * (width + 1));
 
     int i, o = 0;
     int bi = 0;
@@ -90,7 +91,7 @@ void quadratic_stack_blur(TYPE *data, size_t stride, size_t count, size_t r) {
     SUM_TYPE quad = 0;
 
 #define WRAP(index,limit) ((index) % limit)
-#define WRITE_DATA(v) (data[stride*o++] = v)
+#define WRITE_DATA(v) (data[stride*o++] = (int) v * weight)
 #define WRITE_DUMMY(v) ;
 #define GET_BUFFER(i) (buffer[WRAP(bi + i, buffer_size)])
 
