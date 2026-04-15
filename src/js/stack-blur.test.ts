@@ -6,9 +6,10 @@ import { decode, encode } from "fast-png";
 import { fromHex, toHex } from "uint8array-tools"
 
 import { quadraticStackBlur } from './quadratic-stack-blur';
+import { stackBlur } from './stack-blur';
 import { makeTables } from './integer-tables';
 
-describe('quadratic stack blur', () => {
+describe('quadraticStackBlur', () => {
 
     it('simple test in row middle', () => {
         const data = fromHex("000000000000000203040a0403020000000000000000000000000000");
@@ -51,3 +52,12 @@ describe('quadratic stack blur', () => {
     })
 
 });
+
+describe('stackBlur', () => {
+    it('simple test', () => {
+        const data = fromHex("000000000000000203040a0403020000000000000000000000000000");
+        const count = data.length;
+        stackBlur(data, 0, 1, count, 1);
+        expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
+    });
+})

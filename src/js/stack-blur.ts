@@ -1,20 +1,19 @@
-const DATA = [
-    0, 0, 0, 0, 0, 1, 8, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-];
-
-export function stackBlur(data: Array<number>, radius: number) {
+export function stackBlur(data: Uint8Array, origin: number, stride: number, count: number, radius: number) {
 
     const width = radius + 1;
     const buffer_size = 2 * radius + 1;
+    const weight = (width * width);
 
     const buffer = new Array(buffer_size).fill(0);
     
     let left: number = 0, right: number = 0;
     let sum: number = 0;
     let bi: number = 0;
-    for(let i = 0; i < data.length; i++) {
+    let o: number = 0;
 
-        let p = data[i];
+    for(let i = 0; i < count; i++) {
+
+        let p = data[origin + i*stride];
 
         let old = buffer[bi];
         buffer[bi] = p;
@@ -32,10 +31,10 @@ export function stackBlur(data: Array<number>, radius: number) {
         right -= rem;
 
         // Output
-        const value = sum / (width * width);
+        data[origin + (o++)*stride] = Math.round(sum / weight);
         
         sum -= left;
 
-        console.log(new Number(value).toFixed(2), p, sum, left, right, "{ " + buffer.join(", ") + "}");
+        // console.log(new Number(value).toFixed(2), p, sum, left, right, "{ " + buffer.join(", ") + "}");
     }
 }
