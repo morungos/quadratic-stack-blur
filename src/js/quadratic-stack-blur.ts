@@ -63,18 +63,16 @@ export function quadraticStackBlur(data: Uint8Array, origin: number, stride: num
     const getBuffer = (i: number) => {
         const index = wrap(bi + i, buffer_size);
         const v = buffer[index];
-        // console.log(`read i=${i}, v=${v}`)
         return v;
     };
 
     // The core update function, decoupled from data access and from writing.
-    
     const update = (rem: number, add: number, read: (i: number) => number, gen: (v: number) => void) => {
         left_out -= rem;
-        left_in += read(mid);                // right += p;
-        left += left_in;                       // sum += right;
-        left_out += read(left_out_end);      // left += rem;
-        left_in -= read(left_in_start);      // right -= rem;
+        left_in += read(mid);
+        left += left_in;
+        left_out += read(left_out_end);
+        left_in -= read(left_in_start);
 
         right_out -= read(mid - 1);
         right_in += add;
@@ -115,7 +113,6 @@ export function quadraticStackBlur(data: Uint8Array, origin: number, stride: num
     }
 
     bi = 0;
-    // console.log(`step2 left=${left}, right=${right}`)
 
     // Step 3. The main data traverse, across the pixels. The output trails the
     // input by `radius+1`. Therefore, for the starting edge, we need to preload
@@ -136,7 +133,6 @@ export function quadraticStackBlur(data: Uint8Array, origin: number, stride: num
 
         update(old, p, getBuffer, (v) => {
             write(o++, v);
-            // console.log("step3", new Number(v).toFixed(2), `i=${i}, p=${p}, old=${old}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}");
         });
     }
 
@@ -152,7 +148,6 @@ export function quadraticStackBlur(data: Uint8Array, origin: number, stride: num
 
         update(old, p, getBuffer, (v) => {
             write(o++, v);
-            // console.log("step4", new Number(v).toFixed(2), `i=${i}, p=${p}, old=${old}, left=${left}, right=${right}`, "{" + buffer.join(",") + "}");
         });
     }
 }
