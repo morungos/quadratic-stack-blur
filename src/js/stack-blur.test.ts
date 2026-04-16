@@ -63,5 +63,6 @@ describe('makeTables', () => {
         const table = makeTables();
         expect(table.multipliers[2]).toBe(171);
         expect(table.shifts[2]).toBe(11);
+        console.log(table);
     })
 });

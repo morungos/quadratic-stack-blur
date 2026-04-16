@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <assert.h>
-
-#include "stack-blur.h"
 
 /**
  * Quadratic stack blur implementation.
@@ -14,6 +9,47 @@
  * 2. Minimal memory access
  * 3. Use reflection at borders
  */
+
+#include <stdio.h>
+#include <stdint.h>
+#include <assert.h>
+
+#include "stack-blur.h"
+
+/**
+ * A multiplier table, to be used with the shift table. These create integer
+ * arithmetic approximations to the division factors used to normalize blur
+ * values. For the calculations, see the corresponding TypeScript file. The
+ * index is the radius. These tables allow us to remove all floating point
+ * computations.
+ */
+static const uint16_t multipliers[] = {
+      0,   0, 171, 205, 171, 469, 137, 405, 137, 213,
+    313, 505, 391,  81, 261, 441, 365, 157, 265, 463,
+    199, 351, 153, 273, 481,  27, 385,  87, 313, 285,
+    129, 471, 429, 395, 361, 167, 307, 285, 263, 245,
+    227, 425, 395, 185, 173, 325,  19, 287, 269, 127,
+    239, 453, 427, 405, 383,  91, 345,  41,  39, 297,
+    141, 269, 257, 245
+};
+
+/**
+ * The shift table accompanying the multipliers. The idea is thar for the weight
+ * associated with a given radius `r`, which would normally divide the sum,
+ * values, instead we multiply by the multiplier value and shift by the shift
+ * value. The results are all within the precision of uint8_t, which is all that
+ * we truly need. And the multiplications are all 24-bit integer arithmetic, so 
+ * on OpenCL, `mul24()` is fine.
+ */
+
+static const uint8_t shifts[] = {
+     0,  0, 11, 12, 13, 15, 14, 16, 15, 16, 17, 18,
+    18, 16, 18, 19, 19, 18, 19, 20, 19, 20, 19, 20,
+    21, 17, 21, 19, 21, 21, 20, 22, 22, 22, 22, 21,
+    22, 22, 22, 22, 22, 23, 23, 22, 22, 23, 19, 23,
+    23, 22, 23, 24, 24, 24, 24, 22, 24, 21, 21, 24,
+    23, 24, 24, 24
+};
 
 #define MAX_RADIUS (5)
 
@@ -30,8 +66,12 @@
 // A composable part of the update process. The GET_BUFFER and WRITE values are
 // expected to be macros in their own right, which vary between the startup,
 // main, and closedown stages. REM and ADD are the values to remove and add.
-// GET_BUFFER is used with a buffer index, and WRITE is used with a value and 
+// GET_BUFFER is used with a buffer index, and WRITE is used with a value and
 // writes elements strictly sequentially.
+//
+// This is written as a macro so the rolling sum calculations can be reused
+// across the phases of the algorithm. Inline functions would be another option,
+// but annoyingly, on OpenCL, they are a little problematic, as typically.
 
 #define UPDATE(REM,ADD,GET_BUFFER,WRITE) \
     left_out -= REM; \
