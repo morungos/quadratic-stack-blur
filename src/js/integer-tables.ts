@@ -52,14 +52,24 @@ export function getBestEstimate(weight: number): Estimate {
     return estimate;
 }
 
+type WeightTables = {
+    multipliers: Array<number>,
+    shifts: Array<number>
+};
 
-export function makeTables() {
+export function makeTables(): WeightTables {
+    const table: WeightTables = {
+        multipliers: new Array(64).fill(0),
+        shifts: new Array(64).fill(0),
+    }
     for(let r = 2; r < 64; r++) {
         const width = r + 1;
         const acc_width = (r) >> 1;
         const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
         const estimate = getBestEstimate(1.0 / (weight));
-        console.log("Value", r, weight, estimate);
+        table.multipliers[r] = estimate.multiplier;
+        table.shifts[r] = estimate.shift;
     }
+    return table;
 }

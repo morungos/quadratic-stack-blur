@@ -47,10 +47,6 @@ describe('quadraticStackBlur', () => {
         fs.writeFileSync(output_file, buffer);
     });
 
-    it('test', () => {
-        makeTables();
-    })
-
 });
 
 describe('stackBlurOne', () => {
@@ -60,4 +56,12 @@ describe('stackBlurOne', () => {
         stackBlurOne(data, 0, 1, count);
         expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
     });
-})
+});
+
+describe('makeTables', () => {
+    it('creates a table', () => {
+        const table = makeTables();
+        expect(table.multipliers[2]).toBe(171);
+        expect(table.shifts[2]).toBe(11);
+    })
+});
