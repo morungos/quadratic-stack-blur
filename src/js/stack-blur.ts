@@ -1,3 +1,16 @@
+/**
+ * A fixed stack blur, of radius one. This is a fallback for when someone tries
+ * a quadratic stack blur with a radius of one, which doesn't work. This is
+ * simpler than the quadratic stack blur, but we still need to handle the
+ * reflecting edge cases. Fortunately, because there is no accumulating needed,
+ * this is much simpler, but apart from the radius, we keep the API just as
+ * simple.
+ *
+ * @param data 
+ * @param origin 
+ * @param stride 
+ * @param count 
+ */
 export function stackBlurOne(data: Uint8Array, origin: number, stride: number, count: number) {
 
     const width = 2;
