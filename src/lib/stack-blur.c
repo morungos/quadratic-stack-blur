@@ -53,14 +53,6 @@ static const uint8_t shifts[] = {
 
 #define MAX_RADIUS (5)
 
-#define INDEX_MID (r)
-#define INDEX_LEFT_LIMIT (0)
-#define INDEX_RIGHT_LIMIT (r << 1)
-#define INDEX_LEFT_OUT_END (INDEX_LEFT_LIMIT + acc_width)
-#define INDEX_LEFT_IN_START (INDEX_MID - acc_width)
-#define INDEX_RIGHT_OUT_END (INDEX_MID + acc_width)
-#define INDEX_RIGHT_IN_START (INDEX_RIGHT_LIMIT - acc_width)
-
 #define INITIAL_BUFFER(i) i
 
 // A composable part of the update process. The GET_BUFFER and WRITE values are
@@ -90,6 +82,9 @@ static const uint8_t shifts[] = {
     left -= left_out; \
     right -= right_out; 
 
+
+// Adds a number of inline functions which effectively replicate OpenCL ones. 
+
 #ifndef __OPENCL_VERSION__
 
 /**
@@ -114,7 +109,12 @@ static inline int select(int a, int b, int c) {
  */
 void quadratic_stack_blur(TYPE *data, size_t stride, size_t count, size_t r) {
 
-    // Allow a buffer that's big enough
+    // Statically allocate a buffer that's big enough. This could be done using
+    // pointers into the data, but... part of our goal here is to improve memory
+    // access patterns, and those pointers are harder to cache. So long as this
+    // buffer is fairly small (which for our case is true) this is fine. For a 
+    // large radius, possibly less so.
+
     TYPE buffer[(MAX_RADIUS << 1) + 1];
 
     const int buffer_size = (r << 1) + 1;
@@ -135,13 +135,21 @@ void quadratic_stack_blur(TYPE *data, size_t stride, size_t count, size_t r) {
 #define WRITE_DUMMY(v) ;
 #define GET_BUFFER(i) (buffer[WRAP(bi + i, buffer_size)])
 
+#define INDEX_MID (r)
+#define INDEX_LEFT_LIMIT (0)
+#define INDEX_RIGHT_LIMIT (r << 1)
+#define INDEX_LEFT_OUT_END (INDEX_LEFT_LIMIT + acc_width)
+#define INDEX_LEFT_IN_START (INDEX_MID - acc_width)
+#define INDEX_RIGHT_OUT_END (INDEX_MID + acc_width)
+#define INDEX_RIGHT_IN_START (INDEX_RIGHT_LIMIT - acc_width)
+
     // Initialize the buffer
     buffer[r] = data[0];
     for(i = 1; i < width; i++) {
         buffer[r - i] = buffer[r + i] = data[i * stride];
     }
 
-    // process the left/top edge
+    // initialize using the left/top edge
     for(i = 0; i < 2 * r + 1; i++) {
         UPDATE(0, buffer[i], INITIAL_BUFFER, WRITE_DUMMY);
     }
@@ -173,4 +181,12 @@ void quadratic_stack_blur(TYPE *data, size_t stride, size_t count, size_t r) {
 #undef WRITE_DATA
 #undef WRITE_DUMMY
 #undef GET_BUFFER
+
+#undef INDEX_MID
+#undef INDEX_LEFT_LIMIT
+#undef INDEX_RIGHT_LIMIT
+#undef INDEX_LEFT_OUT_END
+#undef INDEX_LEFT_IN_START
+#undef INDEX_RIGHT_OUT_END
+#undef INDEX_RIGHT_IN_START
 }
