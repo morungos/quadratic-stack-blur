@@ -157,10 +157,9 @@ void quadratic_stack_blur(TYPE *data, size_t stride, size_t count, size_t r) {
     for(i = r; i < count; i++) {
         TYPE p = data[i*stride];
 
-        int new_bi = WRAP(bi + 1, buffer_size);
         TYPE old = buffer[bi];
         buffer[bi] = p;
-        bi = new_bi;
+        bi = WRAP(bi + 1, buffer_size);
 
         UPDATE(old, p, GET_BUFFER, WRITE_DATA);
     }
@@ -169,10 +168,9 @@ void quadratic_stack_blur(TYPE *data, size_t stride, size_t count, size_t r) {
         int bx = buffer_size + bi - 2*(i + 1);
         TYPE p = buffer[WRAP(bx, buffer_size)];
 
-        int new_bi = WRAP(bi + 1, buffer_size);
         TYPE old = buffer[bi];
         buffer[bi] = p;
-        bi = new_bi;
+        bi = WRAP(bi + 1, buffer_size);
 
         UPDATE(old, p, GET_BUFFER, WRITE_DATA);
     }
