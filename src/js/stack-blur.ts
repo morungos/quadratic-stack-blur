@@ -6,6 +6,10 @@
  * this is much simpler, but apart from the radius, we keep the API just as
  * simple.
  *
+ * Because this is only used for radius one, we can optimize a lot of it. The
+ * weight, for example, is always four. That means we do not need to run
+ * divisions, we can simply run a shift.
+ *
  * @param data 
  * @param origin 
  * @param stride 
@@ -19,7 +23,7 @@ const weight = (width * width);
 
 export function stackBlurOne(data: Uint8Array, origin: number, stride: number, count: number) {
 
-    const buffer = new Array(buffer_size).fill(0);
+    const buffer: Array<number> = new Array(buffer_size);
     
     let left: number = 0, right: number = 0;
     let sum: number = 0;
