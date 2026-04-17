@@ -11,21 +11,35 @@ import { makeTables } from './integer-tables';
 
 describe('quadraticStackBlur', () => {
 
-    test.skip('simple test in row middle', () => {
+    test('simple test in row middle', () => {
         const data = fromHex("000000000000000203040a0403020000000000000000000000000000");
         const count = data.length;
         quadraticStackBlur(data, 0, 1, count, 5);
         expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
     });
 
-    test.skip('simple test on edges', () => {
+    test('bigger tests in row middle', () => {
+        const data = fromHex("000000000000000000000203040a040a04030200000000000000000000000203040a040302000000000000000000000203040a0403040a04030200000000000");
+        const count = data.length;
+        quadraticStackBlur(data, 0, 1, count, 5);
+        expect(toHex(data)).toBe("000000000000000001020304050506050504030201000000000000000102020304040403020201000000000000010202030405050505050403020201000000");
+    });
+
+    test('edge tests', () => {
+        const data = fromHex("040a04030200000000000000000000000203040a040302000000000000000000000203040a0403");
+        const count = data.length;
+        quadraticStackBlur(data, 0, 1, count, 5);
+        expect(toHex(data)).toBe("060505040302010000000000000001020203040404030202010000000000000102020304050505");
+    });
+
+    test('simple test on edges', () => {
         const data = fromHex("0000000203040a040302000000000203040a040302000000000000000000000000000203040a");
         const count = data.length;
         quadraticStackBlur(data, 0, 1, count, 5);
-        expect(toHex(data)).toBe("0101020304040404030202010102020304040403020201000000000000000000010202030404");
+        expect(toHex(data)).toBe("0101020203040404030202010102020304040403020201000000000000000000010202030404");
     });
 
-    test.skip('works on an entire image', async () => {
+    test('works on an entire image', async () => {
         
         const test_file = path.join(__dirname, '..', '..', 'data', 'image.png')
         const data = fs.readFileSync(test_file);
@@ -50,11 +64,11 @@ describe('quadraticStackBlur', () => {
 });
 
 describe('stackBlurOne', () => {
-    test.skip('is correct in body data', () => {
+    test('is correct in body data', () => {
         const data = fromHex("000000000000000203040a0403020000000000000000000000000000");
         const count = data.length;
         stackBlurOne(data, 0, 1, count);
-        expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
+        expect(toHex(data)).toBe("00000000000001020305070503020100000000000000000000000000");
     });
     test('is correct on data edges', () => {
         const data = fromHex("0a0200000000000000020a020000000003040b04030000000003040b");
@@ -65,7 +79,7 @@ describe('stackBlurOne', () => {
 });
 
 describe('makeTables', () => {
-    test.skip('creates the quadratic weights table', () => {
+    test('creates the quadratic weights table', () => {
         const table = makeTables();
         expect(table.multipliers[2]).toBe(171);
         expect(table.shifts[2]).toBe(11);

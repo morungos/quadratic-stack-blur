@@ -41,7 +41,7 @@ export function quadraticStackBlur(data: Uint8Array, origin: number, stride: num
     const weight = acc_width * (width - acc_width + 1) * (width + 1);
 
     const write = (x: number, v: number) => {
-        data[origin + x*stride] = Math.round(v);
+        data[origin + x*stride] = Math.round(v / weight);
     };
 
     let bi = 0;
@@ -82,7 +82,7 @@ export function quadraticStackBlur(data: Uint8Array, origin: number, stride: num
 
         quad += right;
 
-        gen(quad / weight);
+        gen(quad);
 
         quad -= left;
         left -= left_out;           // sum -= left;
@@ -118,7 +118,11 @@ export function quadraticStackBlur(data: Uint8Array, origin: number, stride: num
     // input by `radius+1`. Therefore, for the starting edge, we need to preload
     // `2*radius` values, but for symmetry, let's just fill the buffer.
 
-    for(let i = radius; i < count; i++) {
+    // Retrospectively write the value that would have been generated
+    write(o++, quad + left_out + left);
+
+    // Now process all the main body; on completion, buffer values will be in place
+    for(let i = radius + 1; i < count; i++) {
 
         let p = data[origin + i*stride];
 
