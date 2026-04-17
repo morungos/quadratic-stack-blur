@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "generate": "npx ts-node ./src/js/generate-tables.ts ./src/lib/quadratic-blur-weights.c"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",

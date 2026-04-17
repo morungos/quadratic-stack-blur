@@ -25,7 +25,7 @@ describe('quadraticStackBlur', () => {
         expect(toHex(data)).toBe("0101020304040404030202010102020304040403020201000000000000000000010202030404");
     });
 
-    test.skip('basic stack blur', async () => {
+    test.skip('works on an entire image', async () => {
         
         const test_file = path.join(__dirname, '..', '..', 'data', 'image.png')
         const data = fs.readFileSync(test_file);
