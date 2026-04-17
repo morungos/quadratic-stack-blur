@@ -50,13 +50,13 @@ describe('quadraticStackBlur', () => {
 });
 
 describe('stackBlurOne', () => {
-    test.skip('simple test', () => {
+    test.skip('is correct in body data', () => {
         const data = fromHex("000000000000000203040a0403020000000000000000000000000000");
         const count = data.length;
         stackBlurOne(data, 0, 1, count);
         expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
     });
-    test('edge', () => {
+    test('is correct on data edges', () => {
         const data = fromHex("0a0200000000000000020a020000000003040b04030000000003040b");
         const count = data.length;
         stackBlurOne(data, 0, 1, count);

@@ -11,12 +11,13 @@
  * @param stride 
  * @param count 
  */
-export function stackBlurOne(data: Uint8Array, origin: number, stride: number, count: number) {
 
-    const radius = 1;
-    const width = radius + 1;
-    const buffer_size = 2 * radius + 1;
-    const weight = (width * width);
+const radius = 1;
+const width = radius + 1;
+const buffer_size = 2 * radius + 1;
+const weight = (width * width);
+
+export function stackBlurOne(data: Uint8Array, origin: number, stride: number, count: number) {
 
     const buffer = new Array(buffer_size).fill(0);
     
@@ -39,11 +40,7 @@ export function stackBlurOne(data: Uint8Array, origin: number, stride: number, c
 
     data[origin + (o++)*stride] = Math.round((2 * buffer[0] + 2 * buffer[1]) / weight);
 
-    // // data[origin + (o++)*stride] = Math.round((2 * buffer[0] + 2 * buffer[1]) / weight);
-    // console.log("output o=0", 2 * buffer[0] + buffer[1], `left=${left}, right=${right}, sum=${sum}`, buffer);
-    // // console.log("output", 1, 2 * buffer[0] + 2 * buffer[1], `left=${left}, right=${right}, sum=${sum}`, buffer);
-    
-    for(let i = width; i < count - 1; i++) {
+    for(let i = width; i < count; i++) {
         let p = data[origin + i*stride];
 
         let old = buffer[bi];
@@ -62,16 +59,9 @@ export function stackBlurOne(data: Uint8Array, origin: number, stride: number, c
         right -= rem;
 
         // Output
-        const osum = sum;
-        const out = Math.round(sum / weight);
-        const outi = o++;
-        data[origin + outi*stride] = out;
+        data[origin + (o++*stride)] = Math.round(sum / weight);
         
         sum -= left;
-
-        console.log(`stat o=${outi}`, `p=${p}, i=${i}, left=${left}, right=${right}, sum=${sum}, osum=${osum}, bi=${bi}`, buffer)
-
-        // console.log(new Number(value).toFixed(2), p, sum, left, right, "{ " + buffer.join(", ") + "}");
     }
 
     // At the end, we need a slightly different calculation -- again one which 
@@ -81,7 +71,5 @@ export function stackBlurOne(data: Uint8Array, origin: number, stride: number, c
 
     let next = bi + 1 == buffer_size ? 0 : bi + 1;
     sum = right + sum + buffer[next];
-    const out = Math.round(sum / weight);
-    console.log("end", o, count, out, sum);
-    data[origin + (o++)*stride] = out;
+    data[origin + (o++)*stride] = Math.round(sum / weight);
 }
