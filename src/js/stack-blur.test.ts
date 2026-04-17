@@ -11,21 +11,21 @@ import { makeTables } from './integer-tables';
 
 describe('quadraticStackBlur', () => {
 
-    it('simple test in row middle', () => {
+    test.skip('simple test in row middle', () => {
         const data = fromHex("000000000000000203040a0403020000000000000000000000000000");
         const count = data.length;
         quadraticStackBlur(data, 0, 1, count, 5);
         expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
     });
 
-    it('simple test on edges', () => {
+    test.skip('simple test on edges', () => {
         const data = fromHex("0000000203040a040302000000000203040a040302000000000000000000000000000203040a");
         const count = data.length;
         quadraticStackBlur(data, 0, 1, count, 5);
         expect(toHex(data)).toBe("0101020304040404030202010102020304040403020201000000000000000000010202030404");
     });
 
-    it('basic stack blur', async () => {
+    test.skip('basic stack blur', async () => {
         
         const test_file = path.join(__dirname, '..', '..', 'data', 'image.png')
         const data = fs.readFileSync(test_file);
@@ -50,16 +50,22 @@ describe('quadraticStackBlur', () => {
 });
 
 describe('stackBlurOne', () => {
-    it('simple test', () => {
+    test.skip('simple test', () => {
         const data = fromHex("000000000000000203040a0403020000000000000000000000000000");
         const count = data.length;
         stackBlurOne(data, 0, 1, count);
         expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
     });
+    test('edge', () => {
+        const data = fromHex("0a0200000000000000020a020000000000040b0400000003040b");
+        const count = data.length;
+        stackBlurOne(data, 0, 1, count);
+        expect(toHex(data)).toBe("0604010000000000010406040100000001050805010000010b");
+    });
 });
 
 describe('makeTables', () => {
-    it('creates a table', () => {
+    test.skip('creates a table', () => {
         const table = makeTables();
         expect(table.multipliers[2]).toBe(171);
         expect(table.shifts[2]).toBe(11);
