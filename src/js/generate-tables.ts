@@ -38,7 +38,7 @@ function generateTables() {
 
 const int quadratic_weight_maximum_radius = ${ tables.multipliers.length - 1 };
 const int quadratic_weight_multipliers[] = { ${ tables.multipliers.join(", ") } };
-const unsigned int quadratic_weight_multipliers[] = { ${ tables.shifts.join(", ") } };
+const unsigned int quadratic_weight_shifts[] = { ${ tables.shifts.join(", ") } };
 `;
 
 }
