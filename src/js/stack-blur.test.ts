@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, test, expect } from 'vitest';
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -57,10 +57,10 @@ describe('stackBlurOne', () => {
         expect(toHex(data)).toBe("00000000000102020304040403020201000000000000000000000000");
     });
     test('edge', () => {
-        const data = fromHex("0a0200000000000000020a020000000000040b0400000003040b");
+        const data = fromHex("0a0200000000000000020a020000000003040b04030000000003040b");
         const count = data.length;
         stackBlurOne(data, 0, 1, count);
-        expect(toHex(data)).toBe("0604010000000000010406040100000001050805010000010b");
+        expect(toHex(data)).toBe("06040100000000000104060401000001030608060301000001030608");
     });
 });
 

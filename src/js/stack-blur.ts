@@ -30,20 +30,20 @@ export function stackBlurOne(data: Uint8Array, origin: number, stride: number, c
     // messed this transition in the quadratic.
 
     buffer[1] = data[origin];
-    buffer[0] = data[origin + 1*stride];
+    buffer[2] = buffer[0] = data[origin + 1*stride];
 
-    left = buffer[0];
-    right = buffer[1];
-    sum = left + right;
+    left = buffer[0] + buffer[1];
+    right = buffer[2];
+    sum = left;
+    bi = 0;
 
-    //data[origin + (o++)*stride] = Math.round((2 * buffer[0] + buffer[1]) / weight);
+    data[origin + (o++)*stride] = Math.round((2 * buffer[0] + 2 * buffer[1]) / weight);
+
     // // data[origin + (o++)*stride] = Math.round((2 * buffer[0] + 2 * buffer[1]) / weight);
-    //console.log("output o=0", 2 * buffer[0] + buffer[1], `left=${left}, right=${right}, sum=${sum}`, buffer);
+    // console.log("output o=0", 2 * buffer[0] + buffer[1], `left=${left}, right=${right}, sum=${sum}`, buffer);
     // // console.log("output", 1, 2 * buffer[0] + 2 * buffer[1], `left=${left}, right=${right}, sum=${sum}`, buffer);
-    bi = 2;
-
-    for(let i = 1; i < count; i++) {
-
+    
+    for(let i = width; i < count - 1; i++) {
         let p = data[origin + i*stride];
 
         let old = buffer[bi];
@@ -76,7 +76,8 @@ export function stackBlurOne(data: Uint8Array, origin: number, stride: number, c
 
     // At the end, we need a slightly different calculation -- again one which 
     // matches the mirroring logic, and again one which doesn't require additional
-    // memory accesses.
+    // memory accesses. We will have to write two pixels, the one affected by the
+    // radius.
 
     let next = bi + 1 == buffer_size ? 0 : bi + 1;
     sum = right + sum + buffer[next];
