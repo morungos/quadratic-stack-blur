@@ -98,6 +98,37 @@ static inline int select(int a, int b, int c) {
 #endif
 
 /**
+ * As a special case, we implement a basic stack blur with a fixed radius of
+ * one. This will be used for a radius of one. The logic here is distinctly
+ * different from the quadratic stack blur. Much of the time we will not need
+ * this unless we need to handle a radius of one.
+ */
+
+#define STACK_BLUR_RADIUS (1)
+#define STACK_BLUR_BUFFER_SIZE ((STACK_BLUR_RADIUS << 1) + 1)
+#define STACK_BLUR_WIDTH (STACK_BLUR_RADIUS + 1)
+
+static void stack_blur_one(TYPE *data, size_t origin, size_t stride, size_t count) {
+
+    int buffer[STACK_BLUR_BUFFER_SIZE] = { 0 };
+
+    int left = 0, right = 0;
+    int sum = 0;
+    int bi = 0;
+    int o = 0;
+
+    buffer[1] = data[origin];
+    buffer[2] = buffer[0] = data[origin + 1*stride];
+
+    left = buffer[0] + buffer[1];
+    right = buffer[2];
+    sum = left;
+    bi = 0;
+
+    data[origin + (o++)*stride] = (2 * buffer[0] + 2 * buffer[1]) >> 2;
+}
+
+/**
  * The core quadratic_stack_blur function. This is a good approximation to a
  * gaussian blur, but we don't get a sigma value. The values are written back 
  * to the data source, i.e., the blurring filter works in-place.
@@ -107,13 +138,18 @@ static inline int select(int a, int b, int c) {
  * @param count the length of the data to be blurred
  * @param r the radius of the blur function
  */
-void quadratic_stack_blur(TYPE *data, size_t stride, size_t count, size_t r) {
+void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count, size_t r) {
 
     // Statically allocate a buffer that's big enough. This could be done using
     // pointers into the data, but... part of our goal here is to improve memory
     // access patterns, and those pointers are harder to cache. So long as this
     // buffer is fairly small (which for our case is true) this is fine. For a 
     // large radius, possibly less so.
+
+    if (r == 1) {
+        stack_blur_one(data, origin, stride, count);
+        return;
+    }
 
     TYPE buffer[(MAX_RADIUS << 1) + 1];
 
