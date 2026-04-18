@@ -1,7 +1,8 @@
 # quadratic-stack-blur
 
-A piloting repository for a quadratic stack blur. The aim is to prove an
-implementation that provides a quadratic stack blur, initially in plain C.
+A piloting repository for a quadratic stack blur, also known as the bell blur.
+The aim is to prove an implementation that provides a quadratic stack blur,
+initially in plain C, eventually for OpenCL.
 
 Why? Well, for our application, we need a filter that closely approximates a
 gaussian blur, but which requires minimal memory access. With a relatively small
@@ -18,4 +19,5 @@ Note that the one main distinction is that we need a specific edge model,
 reflection, which is not what all the sample code that I've found tends to use.
 
 The aim is to build an efficient quadratic stack blur in plain C, with a good
-edge model.
+edge model. To make sure we get the behaviour right, we'll also have a
+TypeScript implementation which is a little simpler to debug.
