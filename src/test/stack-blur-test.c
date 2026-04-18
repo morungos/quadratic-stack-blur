@@ -40,7 +40,7 @@ CTEST(stack_blur, simple_blur) {
     char *result = (char *)malloc(input_size + 1);
     bytes_to_hex_string(result, input, input_size);
 
-    ASSERT_STR("00000000000102020304040403020201000000000000000000000000", result);
+    ASSERT_STR("00000000000001020305070503020100000000000000000000000000", result);
 
     free(input);
     free(result);

@@ -10,6 +10,7 @@
  * 3. Use reflection at borders
  */
 
+#include <stdio.h>
 #include <stdint.h>
 #include <assert.h>
 
