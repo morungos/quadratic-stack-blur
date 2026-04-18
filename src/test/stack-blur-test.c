@@ -46,6 +46,23 @@ CTEST(stack_blur, simple_blur) {
     free(result);
 }
 
+CTEST(stack_blur, edge_blur) {
+    const char *input_source = "0a0200000000000000020a020000000003040b04030000000003040b";
+    const size_t input_size = strlen(input_source) / 2;
+    uint8_t *input = (uint8_t *)malloc(input_size);
+    hex_string_to_bytes(input, input_source);
+
+    quadratic_stack_blur(input, 0, 1, input_size, 1);
+
+    char *result = (char *)malloc(input_size + 1);
+    bytes_to_hex_string(result, input, input_size);
+
+    ASSERT_STR("06040100000000000104060401000001030608060301000001030608", result);
+
+    free(input);
+    free(result);
+}
+
 CTEST_SKIP(stack_blur, verify) {
     ImageData image = get_pgm_data("image.pgm");
     ASSERT_NOT_NULL(image.data);
