@@ -269,10 +269,10 @@ void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count
     // Step 2. Count up the running sums across the leading edge. This requires
     // us to read only from the buffer, *and* the edge offset also needs to be 
     // used to mask yet-to-be-read values as zeroes.
-    for(j = 0; j < buffer_size; i++) {
+    for(i = 0; i < buffer_size; i++) {
         p = buffer[i];
 
-#define QUADRATIC_BUFFER_INITIAL_GET(x) (cl_select(buffer[(x+j+1) - buffer_size], 0, (x+j+1 < buffer_size)))
+#define QUADRATIC_BUFFER_INITIAL_GET(x) (cl_select(buffer[(x+i+1) - buffer_size], 0, (x+i+1 < buffer_size)))
 #define QUADRATIC_DATA_WRITE_NULL(v) ;
 
         QUADRATIC_UPDATE(0, p, QUADRATIC_BUFFER_INITIAL_GET, QUADRATIC_DATA_WRITE_NULL);
