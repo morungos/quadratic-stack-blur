@@ -16,8 +16,6 @@
 
 #define MAX_RADIUS (20)
 
-#define INITIAL_BUFFER(i) i
-
 // Adds a number of inline functions which effectively replicate OpenCL ones. 
 
 #ifndef __OPENCL_VERSION__
