@@ -10,7 +10,6 @@
  * 3. Use reflection at borders
  */
 
-#include <stdio.h>
 #include <stdint.h>
 #include <assert.h>
 
@@ -92,7 +91,7 @@ static const uint8_t shifts[] = {
  * pipelining reasons. We can model it with bit operations if we choose, but it
  * is more important that it is handy for standard C.
  */
-static inline int select(int a, int b, int c) {
+static inline int cl_select(int a, int b, int c) {
     return c ? b : a;
 }
 #endif
@@ -167,7 +166,7 @@ void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count
     SUM_TYPE quad = 0;
 
 #define WRAP(index,limit) ((index) % limit)
-#define WRITE_DATA(v) (data[stride*o++] = (int) v * weight)
+#define WRITE_DATA(v) (data[origin + stride*o++] = (int) v * weight)
 #define WRITE_DUMMY(v) ;
 #define GET_BUFFER(i) (buffer[WRAP(bi + i, buffer_size)])
 
@@ -180,9 +179,9 @@ void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count
 #define INDEX_RIGHT_IN_START (INDEX_RIGHT_LIMIT - acc_width)
 
     // Initialize the buffer
-    buffer[r] = data[0];
+    buffer[r] = data[origin];
     for(i = 1; i < width; i++) {
-        buffer[r - i] = buffer[r + i] = data[i * stride];
+        buffer[r - i] = buffer[r + i] = data[origin + i*stride];
     }
 
     // initialize using the left/top edge
@@ -191,7 +190,7 @@ void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count
     }
 
     for(i = r; i < count; i++) {
-        TYPE p = data[i*stride];
+        TYPE p = data[origin + i*stride];
 
         TYPE old = buffer[bi];
         buffer[bi] = p;

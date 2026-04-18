@@ -9,7 +9,7 @@
 #include "stack-blur.h"
 
 static int hex_string_to_bytes(uint8_t *out, const char *str) {
-    int i, len = strlen(str);
+    int i, len = strlen(str) >> 1;
 
     for (i = 0; i < len; i++) {
         // Reads str & stores in op
@@ -17,18 +17,33 @@ static int hex_string_to_bytes(uint8_t *out, const char *str) {
         str += 2;
     }
 
-    return len/2;
+    return len;
+}
+
+static int bytes_to_hex_string(char *out, const uint8_t *data, int len) {
+    for (int i = 0; i < len; i++) {
+        // Reads str & stores in op
+        sprintf(&out[i << 1], "%02x", data[i]);
+    }
+    out[len << 1] = '\0';
+    return len << 1;
 }
 
 CTEST(stack_blur, simple_blur) {
     const char *input_source = "000000000000000203040a0403020000000000000000000000000000";
     const size_t input_size = strlen(input_source) / 2;
-    uint8_t *input = malloc(input_size);
+    uint8_t *input = (uint8_t *)malloc(input_size);
     hex_string_to_bytes(input, input_source);
 
     quadratic_stack_blur(input, 0, 1, input_size, 1);
 
+    char *result = (char *)malloc(input_size + 1);
+    bytes_to_hex_string(result, input, input_size);
+
+    ASSERT_STR("00000000000102020304040403020201000000000000000000000000", result);
+
     free(input);
+    free(result);
 }
 
 CTEST_SKIP(stack_blur, verify) {
