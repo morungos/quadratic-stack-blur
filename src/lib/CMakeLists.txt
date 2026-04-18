@@ -4,4 +4,5 @@ project(stackblur LANGUAGES C)
 
 add_library(stackblur 
     stack-blur.c
+    quadratic-blur-weights.c
 )
