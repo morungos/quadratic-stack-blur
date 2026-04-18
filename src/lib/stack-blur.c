@@ -177,8 +177,6 @@ void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count
     const int buffer_size = (r << 1) + 1;
     const int width = r + 1;
     const int acc_width = r >> 1;
-
-    float weight = 1.0f / (acc_width * (width - acc_width + 1) * (width + 1));
     
     int bi = 0, o = 0, i, j, next;
 
