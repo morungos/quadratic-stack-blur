@@ -37,7 +37,7 @@ CTEST(stack_blur, simple_blur) {
 
     quadratic_stack_blur(input, 0, 1, input_size, 1);
 
-    char *result = (char *)malloc(input_size + 1);
+    char *result = (char *)malloc(2*input_size + 1);
     bytes_to_hex_string(result, input, input_size);
 
     ASSERT_STR("00000000000001020305070503020100000000000000000000000000", result);
@@ -54,7 +54,7 @@ CTEST(stack_blur, edge_blur) {
 
     quadratic_stack_blur(input, 0, 1, input_size, 1);
 
-    char *result = (char *)malloc(input_size + 1);
+    char *result = (char *)malloc(2*input_size + 1);
     bytes_to_hex_string(result, input, input_size);
 
     ASSERT_STR("06040100000000000104060401000001030608060301000001030608", result);
