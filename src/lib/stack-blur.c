@@ -10,10 +10,7 @@
  * 3. Use reflection at borders
  */
 
-#include <stdio.h>
 #include <stdint.h>
-#include <assert.h>
-#include <math.h>
 
 #include "stack-blur.h"
 
@@ -34,6 +31,12 @@
 static inline int cl_select(int a, int b, int c) {
     return c ? b : a;
 }
+
+#else 
+
+// The OpenCL version is simpler
+#define cl_select(a,b,c) select(a,b,c)
+
 #endif
 
 /**
@@ -110,7 +113,9 @@ static void stack_blur_one(TYPE *data, size_t origin, size_t stride, size_t coun
 //
 // This is written as a macro so the rolling sum calculations can be reused
 // across the phases of the algorithm. Inline functions would be another option,
-// but annoyingly, on OpenCL, they are a little problematic, as typically.
+// but annoyingly, on OpenCL, they are a little problematic, as typically. The
+// third and fourth arguments are themselves macros. This allows us to optimize
+// situations where, e.g., we do not need an output value at all.
 
 #define UPDATE(REM,ADD,GET_BUFFER,WRITE) \
     left_out -= REM; \
@@ -133,6 +138,9 @@ static void stack_blur_one(TYPE *data, size_t origin, size_t stride, size_t coun
  * The core quadratic_stack_blur function. This is a good approximation to a
  * gaussian blur, but we don't get a sigma value. The values are written back 
  * to the data source, i.e., the blurring filter works in-place.
+ * 
+ * The code here processes a single row, or column. It is intended to be part 
+ * of a 1D workgroup, eventually.
  *
  * @param data the source of data
  * @param stride the offset between adjacent values, i.e., 1 for horizontal data
@@ -184,7 +192,8 @@ void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count
 
     // There is a choice to be made for register/private memory access versus
     // computation. Again, since we want to move to OpenCL, keeping private
-    // memory small is right for us.
+    // memory small is right for us. These should be tested for performance,
+    // because it might well be better to compute these once.
 
 #define QUADRATIC_BUFFER_OFFSET_MID (r)
 #define QUADRATIC_BUFFER_OFFSET_RIGHT_LIMIT (r << 1)
@@ -198,7 +207,8 @@ void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count
 #define QUADRATIC_INDEX_WRAP(x,limit) (x - cl_select(0, (limit), (x) >= limit))
 
 #define QUADRATIC_BUFFER_GET(x) (buffer[QUADRATIC_INDEX_WRAP(bi + (x), buffer_size)])
-#define QUADRATIC_DATA_WRITE(v) (data[origin + (o++)*stride] = (TYPE)round((v) * weight))
+#define QUADRATIC_ROUND(v) (TYPE)(((v) * quadratic_weight_multipliers[r] + (1 << (quadratic_weight_shifts[r] - 1))) >> quadratic_weight_shifts[r])
+#define QUADRATIC_DATA_WRITE(v) (data[origin + (o++)*stride] = QUADRATIC_ROUND(v))
 
     // The core of the running sums update, written as a macro. This is important, because 
     // this is used several times during the process, with different versions of data access
