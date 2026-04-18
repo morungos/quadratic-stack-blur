@@ -90,7 +90,8 @@ static const uint8_t shifts[] = {
 /**
  * On OpenCL, select is better than a ternary conditional, for processor
  * pipelining reasons. We can model it with bit operations if we choose, but it
- * is more important that it is handy for standard C.
+ * is more important that it is handy for standard C. So we create an inline
+ * function we can use for it. Note the argument order is entirely different.
  */
 static inline int cl_select(int a, int b, int c) {
     return c ? b : a;
@@ -134,13 +135,13 @@ static void stack_blur_one(TYPE *data, size_t origin, size_t stride, size_t coun
 
         old = buffer[bi];
         buffer[bi] = p;
-        bi = bi == STACK_BLUR_BUFFER_SIZE - 1 ? 0 : bi + 1;
+        bi = cl_select(bi + 1, 0, bi == STACK_BLUR_BUFFER_SIZE - 1);
 
         // Get the old value and remove it, replacing with the new
         left -= old;
 
         // Pick mid point, remove from right and add to left
-        next = bi + 1 == STACK_BLUR_BUFFER_SIZE ? 0 : bi + 1;
+        next = cl_select(bi + 1, 0, bi + 1 == STACK_BLUR_BUFFER_SIZE);
         rem = buffer[next];
         right += p;
         left += rem;
@@ -158,7 +159,7 @@ static void stack_blur_one(TYPE *data, size_t origin, size_t stride, size_t coun
     // memory accesses. We will have to write two pixels, the one affected by the
     // radius.
 
-    next = bi + 1 == STACK_BLUR_BUFFER_SIZE ? 0 : bi + 1;
+    next = cl_select(bi + 1, 0, bi + 1 == STACK_BLUR_BUFFER_SIZE);
     sum = right + sum + buffer[next];
     data[origin + (o++)*stride] = STACK_BLUR_ROUND(sum);
 }
