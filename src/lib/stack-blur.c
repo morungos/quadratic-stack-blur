@@ -106,6 +106,7 @@ static inline int cl_select(int a, int b, int c) {
 #define STACK_BLUR_RADIUS (1)
 #define STACK_BLUR_BUFFER_SIZE ((STACK_BLUR_RADIUS << 1) + 1)
 #define STACK_BLUR_WIDTH (STACK_BLUR_RADIUS + 1)
+#define STACK_BLUR_ROUND(v) (((v) + 2) >> 2)
 
 static void stack_blur_one(TYPE *data, size_t origin, size_t stride, size_t count) {
 
@@ -113,8 +114,9 @@ static void stack_blur_one(TYPE *data, size_t origin, size_t stride, size_t coun
 
     int left = 0, right = 0;
     int sum = 0;
-    int bi = 0;
-    int o = 0;
+    int bi = 0, next;
+    int o = 0, i;
+    TYPE p, old, rem;
 
     buffer[1] = data[origin];
     buffer[2] = buffer[0] = data[origin + 1*stride];
@@ -124,7 +126,40 @@ static void stack_blur_one(TYPE *data, size_t origin, size_t stride, size_t coun
     sum = left;
     bi = 0;
 
-    data[origin + (o++)*stride] = (2 * buffer[0] + 2 * buffer[1]) >> 2;
+    data[origin + (o++)*stride] = STACK_BLUR_ROUND(2 * buffer[0] + 2 * buffer[1]);
+
+    for(i = STACK_BLUR_WIDTH; i < count; i++) {
+        p = data[origin + i*stride];
+
+        old = buffer[bi];
+        buffer[bi] = p;
+        bi = bi == STACK_BLUR_BUFFER_SIZE - 1 ? 0 : bi + 1;
+
+        // Get the old value and remove it, replacing with the new
+        left -= old;
+
+        // Pick mid point, remove from right and add to left
+        next = bi + 1 == STACK_BLUR_BUFFER_SIZE ? 0 : bi + 1;
+        rem = buffer[next];
+        right += p;
+        left += rem;
+        sum += right;
+        right -= rem;
+
+        // Output
+        data[origin + (o++*stride)] = STACK_BLUR_ROUND(sum);
+        
+        sum -= left;
+    }
+
+    // At the end, we need a slightly different calculation -- again one which 
+    // matches the mirroring logic, and again one which doesn't require additional
+    // memory accesses. We will have to write two pixels, the one affected by the
+    // radius.
+
+    next = bi + 1 == STACK_BLUR_BUFFER_SIZE ? 0 : bi + 1;
+    sum = right + sum + buffer[next];
+    data[origin + (o++)*stride] = STACK_BLUR_ROUND(sum);
 }
 
 /**
