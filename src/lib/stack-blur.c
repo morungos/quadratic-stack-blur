@@ -230,10 +230,10 @@ void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count
 #define QUADRATIC_BUFFER_OFFSET_RIGHT_IN_START (QUADRATIC_BUFFER_OFFSET_RIGHT_LIMIT - acc_width)
 
     // Modulo-free wrapping macro -- it works as long as we don't let x go negative or >= 2*limit
-#define QUADRATIC_INDEX_WRAP(x,limit) (x - cl_select(0, limit, x >= limit))
+#define QUADRATIC_INDEX_WRAP(x,limit) (x - cl_select(0, (limit), (x) >= limit))
 
-#define QUADRATIC_BUFFER_GET(x) (buffer[QUADRATIC_INDEX_WRAP(bi + x, buffer_size)])
-#define QUADRATIC_DATA_WRITE(v) (data[origin + (o++)*stride] = (TYPE)round(v * weight))
+#define QUADRATIC_BUFFER_GET(x) (buffer[QUADRATIC_INDEX_WRAP(bi + (x), buffer_size)])
+#define QUADRATIC_DATA_WRITE(v) (data[origin + (o++)*stride] = (TYPE)round((v) * weight))
 
     // The core of the running sums update, written as a macro. This is important, because 
     // this is used several times during the process, with different versions of data access
