@@ -131,16 +131,18 @@ CTEST(quadratic_stack_blur, simple_test_on_edges) {
     free(result);
 }
 
-CTEST_SKIP(stack_blur, verify) {
+CTEST(stack_blur, verify) {
     ImageData image = get_pgm_data("image.pgm");
     ASSERT_NOT_NULL(image.data);
-
-    CTEST_LOG("Test read: %zux%zu", image.width, image.height);
 
     // Now for the actual blur operation
     // Horizontal pass
     for(int y = 0; y < image.height; y++) {
         quadratic_stack_blur(image.data, y * image.width, 1, image.width, 5);
+    }
+    // Vertical pass
+    for(int x = 0; x < image.width; x++) {
+        quadratic_stack_blur(image.data, x, image.width, image.height, 5);
     }
 
     // Now we can run a blur operation
