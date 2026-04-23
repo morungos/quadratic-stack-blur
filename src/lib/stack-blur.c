@@ -243,7 +243,7 @@ void quadratic_stack_blur(TYPE *data, size_t origin, size_t stride, size_t count
     for(i = 0; i < buffer_size; i++) {
         p = buffer[i];
 
-#define QUADRATIC_BUFFER_INITIAL_GET(x) (cl_select(buffer[(x+i+1) - buffer_size], 0, (x+i+1 < buffer_size)))
+#define QUADRATIC_BUFFER_INITIAL_GET(x) (cl_select(buffer[max(0, (x+i+1) - buffer_size)], 0, (x+i+1 < buffer_size)))
 #define QUADRATIC_DATA_WRITE_NULL(v) ;
 
         QUADRATIC_UPDATE(0, p, QUADRATIC_BUFFER_INITIAL_GET, QUADRATIC_DATA_WRITE_NULL);
